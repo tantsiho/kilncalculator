@@ -74,7 +74,7 @@
                 melocore
             </a>
             <span class="mx-1.5">·</span>
-            <span>v1.4.0</span>
+            <span>v1.5.0</span>
         </div>
 
         <div class="mb-5 p-4 bg-red-50 border border-red-300 rounded-lg text-xs text-red-950 leading-relaxed">
@@ -193,7 +193,8 @@
                 <!-- 形狀換算後的結果顯示 -->
                 <div id="calculated_vol_box" class="hidden text-sm text-indigo-700 font-medium bg-indigo-50 p-2 rounded mt-2 text-center">
                     換算窯爐容量：<span id="calc_vol_display">0.0</span> 公升 (L)
-                    <span class="text-xs text-gray-500 block mt-0.5">內表面積：<span id="calc_area_display">0</span> cm²</span>
+                    <span class="text-xs text-gray-500 block mt-0.5">總內表面積：<span id="calc_area_display">0</span> cm²</span>
+                    <span class="text-xs text-gray-500 block mt-0.5">預設側壁加熱面積：<span id="calc_heated_area_display">0</span> cm²</span>
                 </div>
             </div>
 
@@ -210,11 +211,11 @@
                         <strong class="text-sky-950"><span id="size-volume-display">0.0</span> L</strong>
                     </div>
                     <div class="bg-white border border-sky-100 rounded p-2">
-                        <span class="block text-[10px] text-gray-500">量產窯參考</span>
+                        <span class="block text-[10px] text-gray-500">60 台量產窯曲線</span>
                         <strong class="text-sky-950"><span id="size-ref-wpl">0</span> W/L</strong>
                     </div>
                     <div class="bg-white border border-sky-100 rounded p-2">
-                        <span class="block text-[10px] text-gray-500">參考總功率</span>
+                        <span class="block text-[10px] text-gray-500">1300°C 規格表插值</span>
                         <strong class="text-sky-950"><span id="size-ref-power">0</span> W</strong>
                     </div>
                     <div class="bg-white border border-sky-100 rounded p-2">
@@ -239,22 +240,14 @@
                 </p>
 
                 <details class="mt-2 text-[10px] text-gray-600">
-                    <summary class="cursor-pointer text-sky-700 hover:underline">參考曲線怎麼來的？</summary>
-                    <div class="mt-1.5 leading-relaxed">
-                        這裡的量產窯參考曲線，是以 Skutt 與 Olympic 公開的高溫電窯容量／額定功率資料做 log-log 近似，
-                        約為 <strong>P ≈ 336 × V<sup>0.645</sup></strong>（P=W、V=L）。
-                        它只用來把「尺寸效應」顯示給使用者，不取代保溫、最高溫、形狀、裝窯量與升溫要求的工程判斷。
-                        <div class="mt-1">
-                            <a href="https://skutt.com/products-page/ceramic-kilns/km-614/" target="_blank" rel="noopener noreferrer" class="underline">Skutt KM-614</a>
-                            ·
-                            <a href="https://skutt.com/products-page/ceramic-kilns/km-818/" target="_blank" rel="noopener noreferrer" class="underline">KM-818</a>
-                            ·
-                            <a href="https://skutt.com/products-page/ceramic-kilns/km-1027/" target="_blank" rel="noopener noreferrer" class="underline">KM-1027</a>
-                            ·
-                            <a href="https://skutt.com/products-page/ceramic-kilns/km-1227/" target="_blank" rel="noopener noreferrer" class="underline">KM-1227</a>
-                            ·
-                            <a href="https://www.olympickilns.com/product/fl24e/" target="_blank" rel="noopener noreferrer" class="underline">Olympic FL24E</a>
-                        </div>
+                    <summary class="cursor-pointer text-sky-700 hover:underline">兩條參考線怎麼來的？</summary>
+                    <div class="mt-1.5 leading-relaxed space-y-1">
+                        <p><strong>60 台量產窯曲線：</strong>公開調查的擬合為
+                        <strong>P ≈ 405 × V<sup>0.630</sup></strong>（P=W、V=L），尺寸越大 W/L 自然下降。</p>
+                        <p><strong>1300°C 規格表：</strong>用本工具製作時提供的高溫電窯規格資料，依內部容量做線性插值。
+                        這是另一條獨立實機校準線，不代表所有品牌都必須相同。</p>
+                        <p>兩條線差很多時，不要硬信其中一條；再用「加熱牆面法」或「熱工模型」交叉檢查。</p>
+                        <a href="https://theformofclay.com/blog/kiln-power-survey/" target="_blank" rel="noopener noreferrer" class="underline">60 台量產電窯功率調查</a>
                     </div>
                 </details>
             </div>
@@ -298,7 +291,7 @@
                         <div class="bg-gray-50 p-2 rounded">
                             <span class="text-gray-500 block text-[10px]">1. 熱面斷熱磚 (Hot-Face)</span>
                             <strong id="rec_brick_text" class="text-amber-900 block mt-0.5">K-23 輕質斷熱磚</strong>
-                            <span id="rec_brick_desc" class="text-[10px] text-gray-500 block">耐溫 1260°C，導熱低且省電</span>
+                            <span id="rec_brick_desc" class="text-[10px] text-gray-500 block">Morgan 分類溫度 1315°C；實際使用仍需留材料餘度</span>
                         </div>
                         <div class="bg-gray-50 p-2 rounded">
                             <span class="text-gray-500 block text-[10px]">2. 外層背襯絕熱 (Backup)</span>
@@ -308,7 +301,7 @@
                         <div class="bg-gray-50 p-2 rounded">
                             <span class="text-gray-500 block text-[10px]">3. 建議加熱線 (Wire)</span>
                             <strong id="rec_wire_text" class="text-blue-900 block mt-0.5">康泰爾 Kanthal A1</strong>
-                            <span id="rec_wire_desc" class="text-[10px] text-gray-500 block">耐高溫抗氧化 (ρ=1.4)</span>
+                            <span id="rec_wire_desc" class="text-[10px] text-gray-500 block">高溫抗氧化；20°C 名目 ρ≈1.45</span>
                         </div>
                     </div>
 
@@ -324,73 +317,152 @@
                     <span>⚡ 功率 (W) 評估模式</span>
                     <button type="button" id="toggle-guide-btn" class="text-xs text-blue-600 hover:underline font-normal flex items-center">
                         <svg class="w-3.5 h-3.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        熱學原理觀念說明
+                        功率模型說明
                     </button>
                 </label>
 
-                <!-- 評估模式選單 -->
                 <div class="space-y-1.5 mb-3 text-xs text-gray-800">
-                    <label class="flex items-center cursor-pointer hover:text-amber-800">
-                        <input type="radio" name="power_eval_mode" value="olsen" class="mr-1.5 cursor-pointer" checked>
-                        <span><strong>歐森表面積法則 (推薦)</strong>：以內表面積評估</span>
+                    <label class="flex items-start cursor-pointer hover:text-amber-800">
+                        <input type="radio" name="power_eval_mode" value="commercial" class="mr-1.5 mt-0.5 cursor-pointer" checked>
+                        <span><strong>量產窯經驗法（預設）</strong>：兩條實機參考線交叉估算</span>
                     </label>
-                    <label class="flex items-center cursor-pointer hover:text-amber-800">
-                        <input type="radio" name="power_eval_mode" value="volume" class="mr-1.5 cursor-pointer">
-                        <span><strong>容量與壁厚估算法</strong>：以容量級距 W/L + 牆體修正</span>
+                    <label class="flex items-start cursor-pointer hover:text-amber-800">
+                        <input type="radio" name="power_eval_mode" value="wall" class="mr-1.5 mt-0.5 cursor-pointer">
+                        <span><strong>加熱牆面法</strong>：只算實際配置電熱絲的牆面</span>
                     </label>
-                    <label class="flex items-center cursor-pointer hover:text-amber-800">
-                        <input type="radio" name="power_eval_mode" value="custom" class="mr-1.5 cursor-pointer">
-                        <span><strong>直接指定功率</strong>：手動填寫總瓦數 (W)</span>
+                    <label class="flex items-start cursor-pointer hover:text-amber-800">
+                        <input type="radio" name="power_eval_mode" value="thermal" class="mr-1.5 mt-0.5 cursor-pointer">
+                        <span><strong>熱工模型（進階）</strong>：牆體熱損 + 升溫蓄熱</span>
+                    </label>
+                    <label class="flex items-start cursor-pointer hover:text-amber-800">
+                        <input type="radio" name="power_eval_mode" value="custom" class="mr-1.5 mt-0.5 cursor-pointer">
+                        <span><strong>直接指定功率</strong>：已知額定瓦數時使用</span>
                     </label>
                 </div>
 
-                <!-- 模式 A: 歐森表面積法則參數 -->
-                <div id="eval_olsen_div" class="text-xs space-y-2 bg-white p-2.5 rounded border border-amber-100 mb-2">
-                    <div class="flex justify-between items-center">
-                        <label class="text-gray-700 font-medium">表面功率密度 (W/cm²):</label>
-                        <input type="number" id="olsen_density" class="input-field px-2 py-1 text-xs w-28 text-right" value="0.85" step="0.05" min="0.5" max="2.0">
+                <div id="eval_commercial_div" class="text-xs space-y-2.5 bg-white p-2.5 rounded border border-amber-100 mb-2">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="bg-sky-50 border border-sky-100 rounded p-2">
+                            <span class="block text-[10px] text-gray-500">60 台量產窯曲線</span>
+                            <strong class="text-sky-950"><span id="commercial_survey_power">0</span> W</strong>
+                        </div>
+                        <div class="bg-orange-50 border border-orange-100 rounded p-2">
+                            <span class="block text-[10px] text-gray-500">1300°C 規格表插值</span>
+                            <strong class="text-orange-950"><span id="commercial_catalog_power">0</span> W</strong>
+                        </div>
                     </div>
-                    <div class="text-[11px] text-gray-500">
-                        💡 標準評估值 0.85 W/cm²（一般電窯範圍 0.78 ~ 1.09 W/cm²）
-                    </div>
-                </div>
-
-                <!-- 模式 B: 壁厚修正參數 -->
-                <div id="eval_volume_div" class="hidden text-xs space-y-2.5 bg-white p-2.5 rounded border border-amber-100">
-                    <div>
-                        <label class="text-gray-700 font-medium block mb-1">1. 熱面磚材 (Hot-Face Material)：</label>
-                        <select id="hot_brick_select" class="input-field text-xs py-1 mb-2">
-                            <option value="1.0" selected>K-23 輕質斷熱磚 (耐溫 1260°C / 標準中溫 Cone 6)</option>
-                            <option value="1.08">K-26 輕質斷熱磚 (耐溫 1430°C / 高溫瓷器 Cone 10)</option>
-                            <option value="0.85">陶瓷纖維板/毯 (低蓄熱 / 極速升溫型)</option>
-                        </select>
-
-                        <label class="text-gray-700 font-medium block mb-1">2. 外層背襯絕熱 (Backup Insulation)：</label>
-                        <select id="backup_insul_select" class="input-field text-xs py-1">
-                            <option value="1.18">無背襯 (僅單層磚/板 6.5~7.5 cm) ［熱損較高］</option>
-                            <option value="0.95" selected>加裝 25mm 陶瓷纖維毯/板 ［商用電窯標準省電配置］</option>
-                            <option value="0.82">加裝 50mm 雙層複合絕熱 ［超低散熱 / 省電優選］</option>
+                    <div class="flex items-center justify-between gap-2">
+                        <label class="text-gray-700 font-medium">採用哪個值：</label>
+                        <select id="commercial_basis" class="input-field text-xs py-1.5 w-48">
+                            <option value="high" selected>兩者較高值（建議）</option>
+                            <option value="average">兩者平均</option>
+                            <option value="survey">60 台量產窯曲線</option>
+                            <option value="catalog">1300°C 規格表</option>
                         </select>
                     </div>
-                    <div class="text-[11px] text-amber-800 bg-amber-50 p-1.5 rounded border border-amber-200">
-                        💡 <strong>小知識：</strong> K-26 磚耐溫較高，但密度稍大，導熱率比 K-23 高約 8%，故搭配背襯纖維毯可大幅補償散熱。
+                    <div class="text-[11px] text-gray-600 leading-relaxed">
+                        這裡估的是<strong>高溫電窯常見裝機功率</strong>。低溫專用窯、特殊厚保溫或指定升溫時間，請切換「熱工模型」。
                     </div>
                 </div>
 
-                <!-- 模式 C: 手動指定瓦數 -->
+                <div id="eval_wall_div" class="hidden text-xs space-y-2.5 bg-white p-2.5 rounded border border-amber-100 mb-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-gray-700 font-medium block mb-1">加熱牆面功率密度 (W/cm²)</label>
+                            <input type="number" id="wall_density" class="input-field px-2 py-1.5 text-xs" value="0.95" step="0.01" min="0.1" max="2.5">
+                        </div>
+                        <div>
+                            <label class="text-gray-700 font-medium block mb-1">自訂有效加熱面積（可留空）</label>
+                            <input type="number" id="heated_area_override" class="input-field px-2 py-1.5 text-xs" placeholder="留空＝依幾何計算" min="1" step="10">
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-4 text-xs">
+                        <label class="flex items-center"><input type="checkbox" id="heat_top" class="mr-1.5">頂面有加熱元件</label>
+                        <label class="flex items-center"><input type="checkbox" id="heat_bottom" class="mr-1.5">底面有加熱元件</label>
+                    </div>
+
+                    <div class="bg-slate-50 border border-slate-200 rounded p-2">
+                        目前有效加熱牆面：<strong><span id="heated_area_display">0</span> cm²</strong>
+                    </div>
+
+                    <div class="text-[11px] text-gray-600 leading-relaxed">
+                        Olsen 的快速法乘的是 <strong>heated wall surfaces</strong>，不是六面總內表面積。
+                        Olsen 約 0.78–1.09 W/cm²；60 台量產窯調查中位數約 0.635 W/cm²。
+                        預設 0.95 W/cm² 是偏高溫窯的交叉檢查值，可自行調整。
+                    </div>
+                </div>
+
+                <div id="eval_thermal_div" class="hidden text-xs space-y-2.5 bg-white p-2.5 rounded border border-amber-100 mb-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-gray-700 font-medium block mb-1">熱面材料</label>
+                            <select id="thermal_hot_material" class="input-field text-xs py-1.5">
+                                <option value="k23" selected>K-23 IFB</option>
+                                <option value="k26">K-26 IFB</option>
+                                <option value="fiber">1260°C 陶瓷纖維（簡化）</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-gray-700 font-medium block mb-1">熱面厚度 (cm)</label>
+                            <input type="number" id="thermal_hot_thickness" class="input-field px-2 py-1.5 text-xs" value="7.5" min="0.5" step="0.5">
+                        </div>
+                        <div>
+                            <label class="text-gray-700 font-medium block mb-1">背襯絕熱</label>
+                            <select id="thermal_backup_material" class="input-field text-xs py-1.5">
+                                <option value="none">無</option>
+                                <option value="fiber" selected>陶瓷纖維</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-gray-700 font-medium block mb-1">背襯厚度 (cm)</label>
+                            <input type="number" id="thermal_backup_thickness" class="input-field px-2 py-1.5 text-xs" value="2.5" min="0" step="0.5">
+                        </div>
+                        <div>
+                            <label class="text-gray-700 font-medium block mb-1">升至最高溫時間 (hr)</label>
+                            <input type="number" id="thermal_ramp_hours" class="input-field px-2 py-1.5 text-xs" value="6" min="1" max="48" step="0.5">
+                        </div>
+                        <div>
+                            <label class="text-gray-700 font-medium block mb-1">窯內裝載質量 (kg)</label>
+                            <input type="number" id="thermal_load_mass" class="input-field px-2 py-1.5 text-xs" value="0" min="0" step="1">
+                        </div>
+                        <div>
+                            <label class="text-gray-700 font-medium block mb-1">門縫／結構熱損修正</label>
+                            <input type="number" id="thermal_loss_factor" class="input-field px-2 py-1.5 text-xs" value="1.15" min="1" max="2" step="0.05">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2 bg-blue-50 border border-blue-100 rounded p-2">
+                        <div>
+                            <span class="block text-[10px] text-gray-500">穩態牆體熱損</span>
+                            <strong><span id="thermal_loss_display">0</span> W</strong>
+                        </div>
+                        <div>
+                            <span class="block text-[10px] text-gray-500">升溫蓄熱功率</span>
+                            <strong><span id="thermal_storage_display">0</span> W</strong>
+                        </div>
+                        <div>
+                            <span class="block text-[10px] text-gray-500">簡化熱工合計</span>
+                            <strong><span id="thermal_total_display">0</span> W</strong>
+                        </div>
+                    </div>
+
+                    <div class="text-[11px] text-gray-600 leading-relaxed">
+                        K23/K26 的導熱係數與密度採 Morgan 公開資料；比熱與牆體平均升溫比例是工程近似。
+                        這個模式比固定材料倍率合理，但仍不是完整熱傳模擬。
+                    </div>
+                </div>
+
                 <div id="eval_custom_div" class="hidden text-xs space-y-2 bg-white p-2.5 rounded border border-amber-100">
                     <div class="flex justify-between items-center">
                         <label class="text-gray-700 font-medium">指定總功率 (W):</label>
-                        <input type="number" id="custom_power_input" class="input-field px-2 py-1 text-xs w-28 text-right" value="2500" step="100" min="100">
+                        <input type="number" id="custom_power_input" class="input-field px-2 py-1 text-xs w-28 text-right" value="8000" step="100" min="100">
                     </div>
                 </div>
 
-                <!-- 通用參數：功率設計倍率 -->
                 <div class="mt-2.5 pt-2 border-t border-amber-200/60">
                     <div class="flex items-center justify-between text-xs">
-                        <label class="text-gray-700 font-medium flex items-center" title="用來調整估算功率與升溫能力；不是電氣安全係數">
-                            功率設計倍率:
-                        </label>
+                        <label class="text-gray-700 font-medium">功率設計倍率:</label>
                         <select id="safety_margin_select" class="input-field text-xs py-0.5 px-1.5 w-36 text-right">
                             <option value="1.0" selected>1.00x（基準）</option>
                             <option value="1.1">1.10x（略增升溫能力）</option>
@@ -399,10 +471,7 @@
                         </select>
                     </div>
                     <div class="mt-2 text-[11px] leading-relaxed text-amber-900 bg-amber-100/60 border border-amber-200 rounded p-2">
-                        <strong>倍率用途：</strong>
-                        這個倍率只是在「估算需要多少加熱功率」後，再依希望的升溫速度、保溫條件、裝窯量、老化後性能或個人設計策略增加功率。
-                        <strong>1.00x 代表完全採用基準估算，不額外加功率。</strong>
-                        它不是斷路器、配線或電熱絲的安全係數；電氣安全仍應看下方的總電流、支路電流、表面負載、線徑與實際配線額定。
+                        <strong>倍率用途：</strong>只調整裝機功率策略；不是斷路器、配線或電熱絲安全係數。
                     </div>
                 </div>
             </div>
@@ -410,17 +479,13 @@
             <!-- 熱學觀念說明展開盒 -->
             <div id="thermal-guide-box" class="hidden p-3.5 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-900 space-y-2 leading-relaxed">
                 <h3 class="font-bold text-sm text-blue-950 flex items-center justify-between border-b border-blue-200 pb-1">
-                    <span>💡 為什麼容量小/壁厚薄需要更高瓦數？</span>
+                    <span>💡 為什麼三種算法會不同？</span>
                     <button type="button" id="close-guide-btn" class="text-blue-500 hover:text-blue-800 text-base font-bold">&times;</button>
                 </h3>
-                <p><strong>1. 幾何學（S/V 表面積與體積比）：</strong><br>
-                窯爐「儲熱」與體積成正比，但「散熱」卻是透過外表面進行。小窯爐的表面積佔體積比例遠高於大窯爐（例如 10L 小窯的每公升散熱面積是大窯的數倍），因此每公升需要配置更高瓦數以補償散熱。</p>
-                
-                <p><strong>2. 傅立葉熱傳導（壁厚）：</strong><br>
-                散熱量與壁厚成反比。若使用薄型陶瓷纖維壁（如 3-5 cm），在 1200°C 高溫時熱散失極快，必須提升 20%~30% 瓦數才能順利攻頂升溫。</p>
-
-                <p><strong>3. 歐森表面積法則（Fred Olsen Rule）：</strong><br>
-                陶藝窯爐設計常用的經驗起算方法之一。以「內表面積（cm²）」乘以經驗功率密度（如 0.85 W/cm²）估算功率，可比單純 W/L 更能反映不同形狀的表面積差異；仍需依保溫、最高溫與升溫需求修正。</p>
+                <p><strong>1. 量產窯經驗法：</strong>回答「同尺寸商用高溫窯通常裝多少瓦」。</p>
+                <p><strong>2. 加熱牆面法：</strong>Olsen 的 5–7 W/in² 乘的是有加熱元件的牆面，不是頂、底、側壁全部六面。</p>
+                <p><strong>3. 熱工模型：</strong>把 K23/K26/纖維的厚度與導熱係數、目標溫度、升溫時間放進模型，再估牆體與裝載物蓄熱。</p>
+                <p class="font-medium">三種方法是交叉檢查，不應期待每一種都得到完全相同的數字。</p>
             </div>
 
             <!-- 電壓輸入 -->
@@ -757,6 +822,7 @@
             const calculatedVolBox = document.getElementById('calculated_vol_box');
             const calcVolDisplay = document.getElementById('calc_vol_display');
             const calcAreaDisplay = document.getElementById('calc_area_display');
+            const calcHeatedAreaDisplay = document.getElementById('calc_heated_area_display');
 
             // 窯體尺寸效應 DOM
             const kilnSizeBadge = document.getElementById('kiln-size-badge');
@@ -793,12 +859,32 @@
 
             // 功率評估 DOM
             const powerEvalRadios = document.querySelectorAll('input[name="power_eval_mode"]');
-            const evalOlsenDiv = document.getElementById('eval_olsen_div');
-            const evalVolumeDiv = document.getElementById('eval_volume_div');
+            const evalCommercialDiv = document.getElementById('eval_commercial_div');
+            const evalWallDiv = document.getElementById('eval_wall_div');
+            const evalThermalDiv = document.getElementById('eval_thermal_div');
             const evalCustomDiv = document.getElementById('eval_custom_div');
-            const olsenDensityInput = document.getElementById('olsen_density');
-            const hotBrickSelect = document.getElementById('hot_brick_select');
-            const backupInsulSelect = document.getElementById('backup_insul_select');
+
+            const commercialSurveyPower = document.getElementById('commercial_survey_power');
+            const commercialCatalogPower = document.getElementById('commercial_catalog_power');
+            const commercialBasisSelect = document.getElementById('commercial_basis');
+
+            const wallDensityInput = document.getElementById('wall_density');
+            const heatedAreaOverrideInput = document.getElementById('heated_area_override');
+            const heatTopInput = document.getElementById('heat_top');
+            const heatBottomInput = document.getElementById('heat_bottom');
+            const heatedAreaDisplay = document.getElementById('heated_area_display');
+
+            const thermalHotMaterialSelect = document.getElementById('thermal_hot_material');
+            const thermalHotThicknessInput = document.getElementById('thermal_hot_thickness');
+            const thermalBackupMaterialSelect = document.getElementById('thermal_backup_material');
+            const thermalBackupThicknessInput = document.getElementById('thermal_backup_thickness');
+            const thermalRampHoursInput = document.getElementById('thermal_ramp_hours');
+            const thermalLoadMassInput = document.getElementById('thermal_load_mass');
+            const thermalLossFactorInput = document.getElementById('thermal_loss_factor');
+            const thermalLossDisplay = document.getElementById('thermal_loss_display');
+            const thermalStorageDisplay = document.getElementById('thermal_storage_display');
+            const thermalTotalDisplay = document.getElementById('thermal_total_display');
+
             const customPowerInput = document.getElementById('custom_power_input');
             const powerMultiplierSelect = document.getElementById('safety_margin_select');
 
@@ -878,8 +964,10 @@
 
             // 當前推薦參數快照
             let currentRec = {
-                hotBrickValue: "1.0",
-                backupInsulValue: "0.95",
+                hotMaterial: "k23",
+                hotThicknessCm: 7.5,
+                backupMaterial: "fiber",
+                backupThicknessCm: 2.5,
                 wireMaterialValue: "1.45"
             };
 
@@ -897,12 +985,11 @@
             }
 
             function updatePowerEvalUI() {
-                const evalMode = document.querySelector('input[name="power_eval_mode"]:checked')?.value || 'olsen';
-                
-                evalOlsenDiv?.classList.toggle('hidden', evalMode !== 'olsen');
-                evalVolumeDiv?.classList.toggle('hidden', evalMode !== 'volume');
+                const evalMode = document.querySelector('input[name="power_eval_mode"]:checked')?.value || 'commercial';
+                evalCommercialDiv?.classList.toggle('hidden', evalMode !== 'commercial');
+                evalWallDiv?.classList.toggle('hidden', evalMode !== 'wall');
+                evalThermalDiv?.classList.toggle('hidden', evalMode !== 'thermal');
                 evalCustomDiv?.classList.toggle('hidden', evalMode !== 'custom');
-
                 calculate();
             }
 
@@ -928,50 +1015,34 @@
                 }
 
                 if (temp <= 900) {
-                    if (recTempTag) recTempTag.textContent = `${temp}°C 低溫/烤花`;
-                    if (recBrickText) recBrickText.textContent = "陶瓷纖維板 或 K-20 斷熱磚";
-                    if (recBrickDesc) recBrickDesc.textContent = "低蓄熱升溫快，適用低溫烤花/玻璃";
-                    if (recBackupText) recBackupText.textContent = "可無背襯 或 25mm 纖維毯";
-                    if (recBackupDesc) recBackupDesc.textContent = "散熱損失較小，單層壁結構即足夠";
-                    if (recWireText) recWireText.textContent = "鎳鉻合金 (Nichrome) 或 Kanthal";
-                    if (recWireDesc) recWireDesc.textContent = "低溫下耐用度佳，成本較便宜";
-
-                    currentRec = {
-                        hotBrickValue: "0.85",
-                        backupInsulValue: "1.18",
-                        wireMaterialValue: "1.1"
-                    };
-                } else if (temp > 900 && temp <= 1250) {
-                    if (recTempTag) recTempTag.textContent = `${temp}°C Cone 6 標準`;
+                    if (recTempTag) recTempTag.textContent = `${temp}°C 低溫`;
+                    if (recBrickText) recBrickText.textContent = "陶瓷纖維板/毯 或低溫 IFB";
+                    if (recBrickDesc) recBrickDesc.textContent = "低蓄熱、升溫快；依實際連續使用溫度選材";
+                    if (recBackupText) recBackupText.textContent = "依外殼溫度需求配置";
+                    if (recBackupDesc) recBackupDesc.textContent = "低溫窯可用較薄結構，但仍需實測外殼溫度";
+                    if (recWireText) recWireText.textContent = "Nichrome 或 Kanthal A-1";
+                    if (recWireDesc) recWireDesc.textContent = "依元件溫度與表面負載選擇";
+                    currentRec = { hotMaterial:"fiber", hotThicknessCm:5, backupMaterial:"none", backupThicknessCm:0, wireMaterialValue:"1.1" };
+                } else if (temp <= 1250) {
+                    if (recTempTag) recTempTag.textContent = `${temp}°C 中高溫`;
                     if (recBrickText) recBrickText.textContent = "K-23 輕質斷熱磚";
-                    if (recBrickDesc) recBrickDesc.textContent = "耐溫 1260°C，電窯業界最標準配置";
-                    if (recBackupText) recBackupText.textContent = "加裝 25mm 陶瓷纖維毯";
-                    if (recBackupDesc) recBackupDesc.textContent = "經典背襯，大幅降低外殼溫度與省電";
-                    if (recWireText) recWireText.textContent = "康泰爾 Kanthal A1";
-                    if (recWireDesc) recWireDesc.textContent = "高溫抗氧化極佳，高溫抗氧化佳；20°C 電阻率約 ρ=1.45";
-
-                    currentRec = {
-                        hotBrickValue: "1.0",
-                        backupInsulValue: "0.95",
-                        wireMaterialValue: "1.45"
-                    };
+                    if (recBrickDesc) recBrickDesc.textContent = "Morgan K23 分類溫度 1315°C";
+                    if (recBackupText) recBackupText.textContent = "25mm 陶瓷纖維背襯";
+                    if (recBackupDesc) recBackupDesc.textContent = "降低外層熱損，實際厚度依結構調整";
+                    if (recWireText) recWireText.textContent = "Kanthal A-1";
+                    if (recWireDesc) recWireDesc.textContent = "20°C 名目電阻率約 1.45 Ω·mm²/m";
+                    currentRec = { hotMaterial:"k23", hotThicknessCm:7.5, backupMaterial:"fiber", backupThicknessCm:2.5, wireMaterialValue:"1.45" };
                 } else {
-                    if (recTempTag) recTempTag.textContent = `${temp}°C Cone 10 高溫瓷器`;
-                    if (recBrickText) recBrickText.textContent = "K-26 高溫輕質斷熱磚";
-                    if (recBrickDesc) recBrickDesc.textContent = "耐溫 1430°C，結構強且高溫耐燒";
-                    if (recBackupText) recBackupText.textContent = "加裝 25mm~50mm 雙層絕熱";
-                    if (recBackupDesc) recBackupDesc.textContent = "1300°C高溫散熱快，強烈建議加厚背襯";
-                    if (recWireText) recWireText.textContent = "優先使用 Kanthal A-1 / 高溫 FeCrAl";
-                    if (recWireDesc) recWireDesc.textContent = "1300°C 等級需依元件溫度、安裝型式與原廠曲線驗證";
-
-                    currentRec = {
-                        hotBrickValue: "1.08",
-                        backupInsulValue: "0.82",
-                        wireMaterialValue: "1.45"
-                    };
+                    if (recTempTag) recTempTag.textContent = `${temp}°C 高溫`;
+                    if (recBrickText) recBrickText.textContent = "K-26 或同級高溫 IFB";
+                    if (recBrickDesc) recBrickDesc.textContent = "Morgan K26 分類溫度 1430°C";
+                    if (recBackupText) recBackupText.textContent = "25–50mm 陶瓷纖維背襯";
+                    if (recBackupDesc) recBackupDesc.textContent = "高溫熱損大，複合絕熱通常更合理";
+                    if (recWireText) recWireText.textContent = "Kanthal A-1 / 高溫 FeCrAl";
+                    if (recWireDesc) recWireDesc.textContent = "依元件溫度、線徑與安裝型式核對原廠曲線";
+                    currentRec = { hotMaterial:"k26", hotThicknessCm:7.5, backupMaterial:"fiber", backupThicknessCm:5, wireMaterialValue:"1.45" };
                 }
             }
-
 
             const defaultMultiCoils = [
                 { name: '上 1', zone: 'upper', resistance: '' },
@@ -1244,15 +1315,41 @@
                 return { label: '工業／超大型窯', note: '超大型窯的 W/L 可更低，但配電、分區控制與熱均勻性會成為主要設計問題。' };
             }
 
-            function commercialSizeReference(V) {
-                // Empirical display-only curve fitted from published high-temperature electric kiln specs:
-                // Skutt KM-614 / KM-818 / KM-1027 / KM-1227 and Olympic FL8E/12E/17E/20E/24E/64E.
-                // P ≈ 335.67 * V^0.64485, rounded here for readability.
-                const power = 336 * Math.pow(V, 0.645);
-                return {
-                    power,
-                    wpl: power / V
-                };
+            function surveyCommercialReference(V) {
+                const power = 405 * Math.pow(V, 0.630);
+                return { power, wpl: power / V };
+            }
+
+            const highFireCatalogPoints = [
+                { v: 3.375, p: 1400 },
+                { v: 29.700, p: 6500 },
+                { v: 97.336, p: 8000 },
+                { v: 110.032, p: 10000 },
+                { v: 126.960, p: 11000 },
+                { v: 165.600, p: 12500 },
+                { v: 182.160, p: 13000 },
+                { v: 216.000, p: 15000 },
+                { v: 241.200, p: 16000 },
+                { v: 262.800, p: 16000 },
+                { v: 384.000, p: 18000 }
+            ];
+
+            function interpolateCatalogPower(V) {
+                const pts = highFireCatalogPoints;
+                if (!(V > 0)) return 0;
+                if (V <= pts[0].v) return pts[0].p * (V / pts[0].v);
+
+                for (let i = 0; i < pts.length - 1; i++) {
+                    const a = pts[i], b = pts[i + 1];
+                    if (V >= a.v && V <= b.v) {
+                        const t = (V - a.v) / (b.v - a.v);
+                        return a.p + t * (b.p - a.p);
+                    }
+                }
+
+                const a = pts[pts.length - 2], b = pts[pts.length - 1];
+                const slope = (b.p - a.p) / (b.v - a.v);
+                return b.p + Math.max(0, V - b.v) * slope;
             }
 
             function updateSizeEffectCard(V, calculatedPower = null) {
@@ -1266,29 +1363,29 @@
                     return;
                 }
 
-                const ref = commercialSizeReference(V);
+                const survey = surveyCommercialReference(V);
+                const catalogPower = interpolateCatalogPower(V);
                 const size = classifyKilnSize(V);
 
                 if (sizeVolumeDisplay) sizeVolumeDisplay.textContent = V.toFixed(1);
-                if (sizeRefWpl) sizeRefWpl.textContent = ref.wpl.toFixed(0);
-                if (sizeRefPower) sizeRefPower.textContent = Math.round(ref.power);
+                if (sizeRefWpl) sizeRefWpl.textContent = survey.wpl.toFixed(0);
+                if (sizeRefPower) sizeRefPower.textContent = Math.round(catalogPower);
                 if (kilnSizeBadge) kilnSizeBadge.textContent = size.label;
 
                 if (calculatedPower && calculatedPower > 0) {
                     const currentWpl = calculatedPower / V;
-                    const ratio = currentWpl / ref.wpl;
+                    const refHigh = Math.max(survey.power, catalogPower);
+                    const ratio = calculatedPower / refHigh;
                     let compareText = '';
-                    if (ratio > 1.25) compareText = '（高於量產窯參考）';
-                    else if (ratio < 0.75) compareText = '（低於量產窯參考）';
-                    else compareText = '（接近量產窯參考）';
+                    if (ratio > 1.25) compareText = '（高於兩條實機參考）';
+                    else if (ratio < 0.75) compareText = '（低於兩條實機參考）';
+                    else compareText = '（落在實機參考附近）';
                     if (currentWplDisplay) currentWplDisplay.textContent = `${currentWpl.toFixed(0)} W/L ${compareText}`;
                 } else {
                     if (currentWplDisplay) currentWplDisplay.textContent = '— W/L';
                 }
 
-                // Log scale from 10 L to 1800 L so very large kilns remain visible.
-                const minL = 10;
-                const maxL = 1800;
+                const minL = 10, maxL = 1800;
                 const clamped = Math.min(maxL, Math.max(minL, V));
                 const pos = (Math.log(clamped / minL) / Math.log(maxL / minL)) * 100;
                 if (kilnSizeMarker) kilnSizeMarker.style.left = `calc(${pos.toFixed(1)}% - 3px)`;
@@ -1296,9 +1393,66 @@
                 if (sizeEffectNote) {
                     sizeEffectNote.innerHTML =
                         `<strong>${size.label}：</strong>${size.note} ` +
-                        `目前量產窯尺寸參考約 <strong>${ref.wpl.toFixed(0)} W/L</strong>。` +
-                        `這是容量尺度的參考，不是你的窯一定要做成這個瓦數。`;
+                        `60台曲線約 <strong>${survey.wpl.toFixed(0)} W/L</strong>，` +
+                        `1300°C規格表插值約 <strong>${Math.round(catalogPower)} W</strong>。`;
                 }
+            }
+
+            const thermalMaterials = {
+                k23: { density: 513, cp: 1000, kPoints: [[260,0.13],[540,0.17],[815,0.20],[1100,0.24]] },
+                k26: { density: 657, cp: 1000, kPoints: [[260,0.20],[540,0.23],[815,0.26],[1100,0.29],[1370,0.31]] },
+                fiber: { density: 128, cp: 1050, kPoints: [[260,0.06],[538,0.12],[816,0.21],[1093,0.30]] }
+            };
+
+            function interpolateProperty(points, temp) {
+                if (temp <= points[0][0]) return points[0][1];
+                for (let i = 0; i < points.length - 1; i++) {
+                    const [t1,v1] = points[i], [t2,v2] = points[i+1];
+                    if (temp >= t1 && temp <= t2) {
+                        const f = (temp - t1) / (t2 - t1);
+                        return v1 + f * (v2 - v1);
+                    }
+                }
+                return points[points.length - 1][1];
+            }
+
+            function computeThermalModel(totalAreaCm2, targetTemp) {
+                const ambient = 25;
+                const deltaT = Math.max(1, targetTemp - ambient);
+                const meanWallTemp = ambient + deltaT * 0.5;
+
+                const hot = thermalMaterials[thermalHotMaterialSelect?.value || 'k23'] || thermalMaterials.k23;
+                const hotThicknessM = Math.max(0.001, (parseFloat(thermalHotThicknessInput?.value || 7.5) || 7.5) / 100);
+
+                const backupKey = thermalBackupMaterialSelect?.value || 'none';
+                const backup = backupKey === 'fiber' ? thermalMaterials.fiber : null;
+                const backupThicknessM = backup
+                    ? Math.max(0, (parseFloat(thermalBackupThicknessInput?.value || 0) || 0) / 100)
+                    : 0;
+
+                const kHot = interpolateProperty(hot.kPoints, meanWallTemp);
+                const kBackup = backup ? interpolateProperty(backup.kPoints, Math.max(260, ambient + deltaT * 0.2)) : 0;
+
+                let R = hotThicknessM / Math.max(kHot, 0.001);
+                if (backup && backupThicknessM > 0) R += backupThicknessM / Math.max(kBackup, 0.001);
+
+                const areaM2 = Math.max(0, totalAreaCm2) / 10000;
+                const lossFactor = Math.max(1, parseFloat(thermalLossFactorInput?.value || 1.15) || 1.15);
+                const steadyLoss = areaM2 * deltaT / Math.max(R, 0.001) * lossFactor;
+
+                const rampHours = Math.max(1, parseFloat(thermalRampHoursInput?.value || 6) || 6);
+                const rampSeconds = rampHours * 3600;
+
+                const hotMass = areaM2 * hotThicknessM * hot.density;
+                const backupMass = backup ? areaM2 * backupThicknessM * backup.density : 0;
+                const loadMass = Math.max(0, parseFloat(thermalLoadMassInput?.value || 0) || 0);
+
+                const hotStorageJ = hotMass * hot.cp * deltaT * 0.55;
+                const backupStorageJ = backup ? backupMass * backup.cp * deltaT * 0.25 : 0;
+                const loadStorageJ = loadMass * 900 * deltaT * 0.90;
+                const storagePower = (hotStorageJ + backupStorageJ + loadStorageJ) / rampSeconds;
+
+                return { steadyLoss, storagePower, total: steadyLoss + storagePower };
             }
 
             function clearResults() {
@@ -1327,77 +1481,82 @@
             }
 
             function calculate() {
-                let V = 0; // 公升 (L)
-                let innerSurfaceArea = 0; // cm²
+                let V = 0;
+                let totalInnerSurfaceArea = 0;
+                let sideWallArea = 0;
+                let baseArea = 0;
+
                 const volMode = document.querySelector('input[name="vol_mode"]:checked')?.value || 'direct';
 
                 if (volMode === 'direct') {
                     V = parseFloat(volumeInput ? volumeInput.value : 0) || 0;
                     if (V > 0) {
-                        // no geometry was provided, so estimate with an equal-volume cube.
                         const side = Math.cbrt(V * 1000);
-                        innerSurfaceArea = 6 * Math.pow(side, 2);
+                        baseArea = side * side;
+                        sideWallArea = 4 * baseArea;
+                        totalInnerSurfaceArea = sideWallArea + 2 * baseArea;
                     }
                 } else if (volMode === 'box') {
-                    const l = parseFloat(boxL ? boxL.value : 0) || 0;
-                    const w = parseFloat(boxW ? boxW.value : 0) || 0;
-                    const h = parseFloat(boxH ? boxH.value : 0) || 0;
+                    const l = parseFloat(boxL?.value || 0) || 0;
+                    const w = parseFloat(boxW?.value || 0) || 0;
+                    const h = parseFloat(boxH?.value || 0) || 0;
                     if (l > 0 && w > 0 && h > 0) {
                         V = (l * w * h) / 1000;
-                        innerSurfaceArea = 2 * (l * w + l * h + w * h);
+                        baseArea = l * w;
+                        sideWallArea = 2 * h * (l + w);
+                        totalInnerSurfaceArea = sideWallArea + 2 * baseArea;
                     }
                 } else if (volMode === 'cylinder') {
-                    const r = parseFloat(cylR ? cylR.value : 0) || 0;
-                    const h = parseFloat(cylH ? cylH.value : 0) || 0;
+                    const r = parseFloat(cylR?.value || 0) || 0;
+                    const h = parseFloat(cylH?.value || 0) || 0;
                     if (r > 0 && h > 0) {
-                        V = (Math.PI * Math.pow(r, 2) * h) / 1000;
-                        innerSurfaceArea = 2 * Math.PI * Math.pow(r, 2) + 2 * Math.PI * r * h;
+                        baseArea = Math.PI * r * r;
+                        V = (baseArea * h) / 1000;
+                        sideWallArea = 2 * Math.PI * r * h;
+                        totalInnerSurfaceArea = sideWallArea + 2 * baseArea;
                     }
                 } else if (volMode === 'octagon') {
-                    const a = parseFloat(octS ? octS.value : 0) || 0;
-                    const h = parseFloat(octH ? octH.value : 0) || 0;
+                    const a = parseFloat(octS?.value || 0) || 0;
+                    const h = parseFloat(octH?.value || 0) || 0;
                     if (a > 0 && h > 0) {
-                        const baseArea = 2 * (1 + Math.SQRT2) * Math.pow(a, 2);
+                        baseArea = 2 * (1 + Math.SQRT2) * a * a;
                         V = (baseArea * h) / 1000;
-                        innerSurfaceArea = 2 * baseArea + 8 * a * h;
+                        sideWallArea = 8 * a * h;
+                        totalInnerSurfaceArea = sideWallArea + 2 * baseArea;
                     }
                 } else if (volMode === 'decagon') {
-                    const a = parseFloat(decS ? decS.value : 0) || 0;
-                    const h = parseFloat(decH ? decH.value : 0) || 0;
+                    const a = parseFloat(decS?.value || 0) || 0;
+                    const h = parseFloat(decH?.value || 0) || 0;
                     if (a > 0 && h > 0) {
-                        const baseArea = 2.5 * Math.sqrt(5 + 2 * Math.sqrt(5)) * Math.pow(a, 2);
+                        baseArea = 2.5 * Math.sqrt(5 + 2 * Math.sqrt(5)) * a * a;
                         V = (baseArea * h) / 1000;
-                        innerSurfaceArea = 2 * baseArea + 10 * a * h;
+                        sideWallArea = 10 * a * h;
+                        totalInnerSurfaceArea = sideWallArea + 2 * baseArea;
                     }
                 }
 
-                if (volMode !== 'direct' && calcVolDisplay) {
-                    calcVolDisplay.textContent = V > 0 ? V.toFixed(1) : "0.0";
-                }
-                if (calcAreaDisplay) {
-                    calcAreaDisplay.textContent = innerSurfaceArea > 0 ? Math.round(innerSurfaceArea) : "0";
-                }
+                if (volMode !== 'direct' && calcVolDisplay) calcVolDisplay.textContent = V > 0 ? V.toFixed(1) : "0.0";
+                if (calcAreaDisplay) calcAreaDisplay.textContent = totalInnerSurfaceArea > 0 ? Math.round(totalInnerSurfaceArea) : "0";
+                if (calcHeatedAreaDisplay) calcHeatedAreaDisplay.textContent = sideWallArea > 0 ? Math.round(sideWallArea) : "0";
 
-                // 尺寸效應卡永遠先更新，即使後面的電氣參數尚未完整。
                 updateSizeEffectCard(V);
 
-                const U = parseFloat(voltageInput ? voltageInput.value : 0);
-                const D = parseFloat(diameterInput ? diameterInput.value : 0);
-                const D_rod = parseFloat(rodDiameterInput ? rodDiameterInput.value : 0);
-                const branches = Math.max(1, Math.round(parseFloat(elementBranchesInput ? elementBranchesInput.value : 1) || 1));
+                const U = parseFloat(voltageInput?.value || 0);
+                const D = parseFloat(diameterInput?.value || 0);
+                const D_rod = parseFloat(rodDiameterInput?.value || 0);
+                const branches = Math.max(1, Math.round(parseFloat(elementBranchesInput?.value || 1) || 1));
 
                 let rho = 0;
                 const rhoMode = document.querySelector('input[name="rho_mode"]:checked')?.value || 'preset';
-
                 if (rhoMode === 'preset') {
-                    rho = parseFloat(materialSelect ? materialSelect.value : 1.45);
+                    rho = parseFloat(materialSelect?.value || 1.45);
                 } else if (rhoMode === 'custom') {
-                    rho = parseFloat(customRhoInput ? customRhoInput.value : 1.45);
-                } else if (rhoMode === 'measure') {
-                    const mL = parseFloat(measureLInput ? measureLInput.value : 0);
-                    const mR = parseFloat(measureRInput ? measureRInput.value : 0);
+                    rho = parseFloat(customRhoInput?.value || 1.45);
+                } else {
+                    const mL = parseFloat(measureLInput?.value || 0);
+                    const mR = parseFloat(measureRInput?.value || 0);
                     if (mL > 0 && mR > 0 && D > 0) {
-                        const Smeasure = (Math.PI * Math.pow(D, 2)) / 4;
+                        const Smeasure = Math.PI * D * D / 4;
                         rho = (mR * Smeasure) / mL;
                         if (calcRhoDisplay) calcRhoDisplay.textContent = rho.toFixed(3);
                     } else {
@@ -1406,63 +1565,67 @@
                     }
                 }
 
-                if (
-                    isNaN(V) || isNaN(U) || isNaN(D) || isNaN(D_rod) || isNaN(rho) ||
-                    V <= 0 || U <= 0 || D <= 0 || D_rod <= 0 || rho <= 0 || branches < 1
-                ) {
+                if (isNaN(V) || isNaN(U) || isNaN(D) || isNaN(D_rod) || isNaN(rho) ||
+                    V <= 0 || U <= 0 || D <= 0 || D_rod <= 0 || rho <= 0 || branches < 1) {
                     clearResults();
                     return;
                 }
 
-                let P = 0;
-                const powerEvalMode = document.querySelector('input[name="power_eval_mode"]:checked')?.value || 'olsen';
-                const powerMultiplier = parseFloat(powerMultiplierSelect ? powerMultiplierSelect.value : 1.0) || 1.0;
+                const targetTemp = getTargetTemperature();
+                const powerEvalMode = document.querySelector('input[name="power_eval_mode"]:checked')?.value || 'commercial';
+                const powerMultiplier = parseFloat(powerMultiplierSelect?.value || 1.0) || 1.0;
 
-                if (powerEvalMode === 'olsen') {
-                    const density = parseFloat(olsenDensityInput ? olsenDensityInput.value : 0.85) || 0.85;
-                    P = innerSurfaceArea * density * powerMultiplier;
-                    const equivalentWPerL = V > 0 ? (P / V).toFixed(1) : "0.0";
-                    if (powerAdvice) {
-                        powerAdvice.textContent = `*依內表面積 ${Math.round(innerSurfaceArea)} cm² × ${density} W/cm² 估算：相當於 ${equivalentWPerL} W/L（功率設計倍率 ${powerMultiplier}x）`;
-                    }
-                } else if (powerEvalMode === 'volume') {
-                    let baseWPerL = 85;
-                    let sizeBandText = '10–50 L';
-                    if (V <= 10) {
-                        baseWPerL = 120;
-                        sizeBandText = '≤10 L';
-                    } else if (V <= 50) {
-                        baseWPerL = 85;
-                        sizeBandText = '10–50 L';
-                    } else if (V <= 200) {
-                        baseWPerL = 60;
-                        sizeBandText = '50–200 L';
-                    } else {
-                        baseWPerL = 40;
-                        sizeBandText = '>200 L';
-                    }
+                const surveyRef = surveyCommercialReference(V);
+                const catalogRefPower = interpolateCatalogPower(V);
+                if (commercialSurveyPower) commercialSurveyPower.textContent = Math.round(surveyRef.power);
+                if (commercialCatalogPower) commercialCatalogPower.textContent = Math.round(catalogRefPower);
 
-                    const hotFactor = parseFloat(hotBrickSelect ? hotBrickSelect.value : 1.0) || 1.0;
-                    const backupFactor = parseFloat(backupInsulSelect ? backupInsulSelect.value : 0.95) || 0.95;
-                    P = V * baseWPerL * hotFactor * backupFactor * powerMultiplier;
+                let heatedArea = sideWallArea;
+                if (heatTopInput?.checked) heatedArea += baseArea;
+                if (heatBottomInput?.checked) heatedArea += baseArea;
+                const overrideArea = parseFloat(heatedAreaOverrideInput?.value || 0);
+                if (overrideArea > 0) heatedArea = overrideArea;
+                if (heatedAreaDisplay) heatedAreaDisplay.textContent = Math.round(heatedArea);
 
-                    if (powerAdvice) {
-                        powerAdvice.textContent = `*容量法：${V.toFixed(1)} L 屬 ${sizeBandText} 級距，基準 ${baseWPerL} W/L × 材料修正（功率設計倍率 ${powerMultiplier}x）`;
-                    }
+                const thermal = computeThermalModel(totalInnerSurfaceArea, targetTemp);
+                if (thermalLossDisplay) thermalLossDisplay.textContent = Math.round(thermal.steadyLoss);
+                if (thermalStorageDisplay) thermalStorageDisplay.textContent = Math.round(thermal.storagePower);
+                if (thermalTotalDisplay) thermalTotalDisplay.textContent = Math.round(thermal.total);
+
+                let Pbase = 0;
+                if (powerEvalMode === 'commercial') {
+                    const basis = commercialBasisSelect?.value || 'high';
+                    if (basis === 'survey') Pbase = surveyRef.power;
+                    else if (basis === 'catalog') Pbase = catalogRefPower;
+                    else if (basis === 'average') Pbase = (surveyRef.power + catalogRefPower) / 2;
+                    else Pbase = Math.max(surveyRef.power, catalogRefPower);
+
+                    if (powerAdvice) powerAdvice.textContent =
+                        `*量產窯經驗法：60台曲線 ${Math.round(surveyRef.power)}W；1300°C規格表 ${Math.round(catalogRefPower)}W；` +
+                        `採用 ${Math.round(Pbase)}W × ${powerMultiplier}x。`;
+
+                } else if (powerEvalMode === 'wall') {
+                    const density = Math.max(0.1, parseFloat(wallDensityInput?.value || 0.95) || 0.95);
+                    Pbase = heatedArea * density;
+                    if (powerAdvice) powerAdvice.textContent =
+                        `*加熱牆面法：${Math.round(heatedArea)} cm² × ${density.toFixed(3)} W/cm² = ${Math.round(Pbase)}W × ${powerMultiplier}x。`;
+
+                } else if (powerEvalMode === 'thermal') {
+                    Pbase = thermal.total;
+                    if (powerAdvice) powerAdvice.textContent =
+                        `*簡化熱工：熱損 ${Math.round(thermal.steadyLoss)}W + 蓄熱 ${Math.round(thermal.storagePower)}W = ${Math.round(Pbase)}W × ${powerMultiplier}x。`;
+
                 } else {
-                    const customP = parseFloat(customPowerInput ? customPowerInput.value : 2500) || 2500;
-                    P = customP * powerMultiplier;
-                    if (powerAdvice) {
-                        powerAdvice.textContent = `*手動指定 ${customP} W × 功率設計倍率 ${powerMultiplier}x = ${Math.round(P)} W`;
-                    }
+                    Pbase = parseFloat(customPowerInput?.value || 8000) || 8000;
+                    if (powerAdvice) powerAdvice.textContent = `*手動指定 ${Math.round(Pbase)}W × ${powerMultiplier}x。`;
                 }
 
+                const P = Pbase * powerMultiplier;
                 if (!(P > 0)) {
                     clearResults();
                     return;
                 }
 
-                // 顯示「目前算法」與容量尺度參考的差異，避免尺寸效應藏在公式裡。
                 updateSizeEffectCard(V, P);
 
                 // Supply / branch electrical values.
@@ -1494,7 +1657,7 @@
                 const designMode = document.querySelector('input[name="element_design_mode"]:checked')?.value || 'safe';
                 const mountMode = elementMountSelect?.value || 'groove';
                 const controlMode = elementControlSelect?.value || 'onoff';
-                const targetTemp = getTargetTemperature();
+                // targetTemp 已於功率模型階段取得
 
                 let surfaceLimit = 0;
                 if (designMode === 'safe') {
@@ -1636,14 +1799,16 @@
             // 綁定「一鍵套用建議」按鈕
             if (applyRecBtn) {
                 applyRecBtn.addEventListener('click', () => {
-                    const volRadio = document.querySelector('input[name="power_eval_mode"][value="volume"]');
-                    if (volRadio) {
-                        volRadio.checked = true;
+                    const thermalRadio = document.querySelector('input[name="power_eval_mode"][value="thermal"]');
+                    if (thermalRadio) {
+                        thermalRadio.checked = true;
                         updatePowerEvalUI();
                     }
 
-                    if (hotBrickSelect) hotBrickSelect.value = currentRec.hotBrickValue;
-                    if (backupInsulSelect) backupInsulSelect.value = currentRec.backupInsulValue;
+                    if (thermalHotMaterialSelect) thermalHotMaterialSelect.value = currentRec.hotMaterial;
+                    if (thermalHotThicknessInput) thermalHotThicknessInput.value = currentRec.hotThicknessCm;
+                    if (thermalBackupMaterialSelect) thermalBackupMaterialSelect.value = currentRec.backupMaterial;
+                    if (thermalBackupThicknessInput) thermalBackupThicknessInput.value = currentRec.backupThicknessCm;
 
                     const rhoPresetRadio = document.querySelector('input[name="rho_mode"][value="preset"]');
                     if (rhoPresetRadio) {
@@ -1651,7 +1816,6 @@
                         updateRhoUI();
                     }
                     if (materialSelect) materialSelect.value = currentRec.wireMaterialValue;
-
                     calculate();
                 });
             }
@@ -1697,7 +1861,10 @@
             // 綁定數值變動即時計算
             [
                 volumeInput, boxL, boxW, boxH, cylR, cylH, octS, octH, decS, decH,
-                olsenDensityInput, hotBrickSelect, backupInsulSelect, customPowerInput, powerMultiplierSelect,
+                commercialBasisSelect, wallDensityInput, heatedAreaOverrideInput, heatTopInput, heatBottomInput,
+                thermalHotMaterialSelect, thermalHotThicknessInput, thermalBackupMaterialSelect, thermalBackupThicknessInput,
+                thermalRampHoursInput, thermalLoadMassInput, thermalLossFactorInput,
+                customPowerInput, powerMultiplierSelect,
                 voltageInput, diameterInput, rodDiameterInput, materialSelect, customRhoInput,
                 measureLInput, measureRInput, elementBranchesInput, elementMountSelect,
                 elementControlSelect, customSurfaceLimitInput
