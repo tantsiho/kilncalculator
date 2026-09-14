@@ -74,7 +74,7 @@
                 melocore
             </a>
             <span class="mx-1.5">·</span>
-            <span>v1.1.0</span>
+            <span>v1.2.0</span>
         </div>
 
         <div class="mb-5 p-4 bg-red-50 border border-red-300 rounded-lg text-xs text-red-950 leading-relaxed">
@@ -323,16 +323,25 @@
                     </div>
                 </div>
 
-                <!-- 通用參數：安全餘裕/升溫速率係數 -->
-                <div class="mt-2.5 pt-2 border-t border-amber-200/60 flex items-center justify-between text-xs">
-                    <label class="text-gray-700 font-medium flex items-center" title="預留電熱絲老化降功率與升溫速率餘裕">
-                        安全餘裕 / 升溫倍率:
-                    </label>
-                    <select id="safety_margin_select" class="input-field text-xs py-0.5 px-1.5 w-28 text-right">
-                        <option value="1.0">1.0x (無餘裕)</option>
-                        <option value="1.15" selected>1.15x (標準推薦)</option>
-                        <option value="1.3">1.30x (快燒/高餘裕)</option>
-                    </select>
+                <!-- 通用參數：功率設計倍率 -->
+                <div class="mt-2.5 pt-2 border-t border-amber-200/60">
+                    <div class="flex items-center justify-between text-xs">
+                        <label class="text-gray-700 font-medium flex items-center" title="用來調整估算功率與升溫能力；不是電氣安全係數">
+                            功率設計倍率:
+                        </label>
+                        <select id="safety_margin_select" class="input-field text-xs py-0.5 px-1.5 w-36 text-right">
+                            <option value="1.0" selected>1.00x（基準）</option>
+                            <option value="1.1">1.10x（略增升溫能力）</option>
+                            <option value="1.15">1.15x（額外性能餘量）</option>
+                            <option value="1.3">1.30x（快燒 / 自行判斷）</option>
+                        </select>
+                    </div>
+                    <div class="mt-2 text-[11px] leading-relaxed text-amber-900 bg-amber-100/60 border border-amber-200 rounded p-2">
+                        <strong>倍率用途：</strong>
+                        這個倍率只是在「估算需要多少加熱功率」後，再依希望的升溫速度、保溫條件、裝窯量、老化後性能或個人設計策略增加功率。
+                        <strong>1.00x 代表完全採用基準估算，不額外加功率。</strong>
+                        它不是斷路器、配線或電熱絲的安全係數；電氣安全仍應看下方的總電流、支路電流、表面負載、線徑與實際配線額定。
+                    </div>
                 </div>
             </div>
 
@@ -620,7 +629,7 @@
             const hotBrickSelect = document.getElementById('hot_brick_select');
             const backupInsulSelect = document.getElementById('backup_insul_select');
             const customPowerInput = document.getElementById('custom_power_input');
-            const safetyMarginSelect = document.getElementById('safety_margin_select');
+            const powerMultiplierSelect = document.getElementById('safety_margin_select');
 
             // 說明 Toggle DOM
             const toggleGuideBtn = document.getElementById('toggle-guide-btn');
@@ -923,14 +932,14 @@
 
                 let P = 0;
                 const powerEvalMode = document.querySelector('input[name="power_eval_mode"]:checked')?.value || 'olsen';
-                const safetyMargin = parseFloat(safetyMarginSelect ? safetyMarginSelect.value : 1.15) || 1.15;
+                const powerMultiplier = parseFloat(powerMultiplierSelect ? powerMultiplierSelect.value : 1.0) || 1.0;
 
                 if (powerEvalMode === 'olsen') {
                     const density = parseFloat(olsenDensityInput ? olsenDensityInput.value : 0.85) || 0.85;
-                    P = innerSurfaceArea * density * safetyMargin;
+                    P = innerSurfaceArea * density * powerMultiplier;
                     const equivalentWPerL = V > 0 ? (P / V).toFixed(1) : "0.0";
                     if (powerAdvice) {
-                        powerAdvice.textContent = `*依內表面積 ${Math.round(innerSurfaceArea)} cm² × ${density} W/cm² 估算：相當於 ${equivalentWPerL} W/L（含 ${safetyMargin}x 功率餘裕）`;
+                        powerAdvice.textContent = `*依內表面積 ${Math.round(innerSurfaceArea)} cm² × ${density} W/cm² 估算：相當於 ${equivalentWPerL} W/L（功率設計倍率 ${powerMultiplier}x）`;
                     }
                 } else if (powerEvalMode === 'volume') {
                     let baseWPerL = 85;
@@ -941,16 +950,16 @@
 
                     const hotFactor = parseFloat(hotBrickSelect ? hotBrickSelect.value : 1.0) || 1.0;
                     const backupFactor = parseFloat(backupInsulSelect ? backupInsulSelect.value : 0.95) || 0.95;
-                    P = V * baseWPerL * hotFactor * backupFactor * safetyMargin;
+                    P = V * baseWPerL * hotFactor * backupFactor * powerMultiplier;
 
                     if (powerAdvice) {
-                        powerAdvice.textContent = `*容量法：${V.toFixed(1)} L × ${baseWPerL} W/L × 材料修正（含 ${safetyMargin}x 功率餘裕）`;
+                        powerAdvice.textContent = `*容量法：${V.toFixed(1)} L × ${baseWPerL} W/L × 材料修正（功率設計倍率 ${powerMultiplier}x）`;
                     }
                 } else {
                     const customP = parseFloat(customPowerInput ? customPowerInput.value : 2500) || 2500;
-                    P = customP * safetyMargin;
+                    P = customP * powerMultiplier;
                     if (powerAdvice) {
-                        powerAdvice.textContent = `*手動指定 ${customP} W × ${safetyMargin}x = ${Math.round(P)} W`;
+                        powerAdvice.textContent = `*手動指定 ${customP} W × 功率設計倍率 ${powerMultiplier}x = ${Math.round(P)} W`;
                     }
                 }
 
@@ -1173,7 +1182,7 @@
             // 綁定數值變動即時計算
             [
                 volumeInput, boxL, boxW, boxH, cylR, cylH, octS, octH, decS, decH,
-                olsenDensityInput, hotBrickSelect, backupInsulSelect, customPowerInput, safetyMarginSelect,
+                olsenDensityInput, hotBrickSelect, backupInsulSelect, customPowerInput, powerMultiplierSelect,
                 voltageInput, diameterInput, rodDiameterInput, materialSelect, customRhoInput,
                 measureLInput, measureRInput, elementBranchesInput, elementMountSelect,
                 elementControlSelect, customSurfaceLimitInput
