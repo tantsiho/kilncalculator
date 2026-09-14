@@ -64,7 +64,35 @@
 <body class="flex items-center justify-center min-h-screen p-4">
 
     <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-xl">
-        <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">窯爐加熱器與電熱絲計算器</h1>
+        <h1 class="text-2xl font-bold text-center text-gray-800 mb-2">窯爐加熱器與電熱絲計算器</h1>
+        <div class="text-center text-xs text-gray-500 mb-6">
+            設計者
+            <a href="https://www.threads.com/@melocore"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="font-medium text-blue-600 hover:text-blue-800 hover:underline">
+                melocore
+            </a>
+            <span class="mx-1.5">·</span>
+            <span>v1.1.0</span>
+        </div>
+
+        <div class="mb-5 p-4 bg-red-50 border border-red-300 rounded-lg text-xs text-red-950 leading-relaxed">
+            <div class="font-bold text-sm mb-2">⚠️ 使用前請先確認：這是估算工具，不是施工安全認證</div>
+            <ul class="list-disc pl-5 space-y-1.5">
+                <li>本工具依公開可查資料、常用公式與簡化模型提供設計估算；實際結果會受線材批次、溫度電阻係數、安裝方式、控制方式、散熱、端子與配線條件影響。</li>
+                <li><strong>高溫窯爐涉及市電、高電流、高溫、觸電與火災風險。</strong> 使用者必須自行確認斷路器、配線線徑、插頭插座／端子、接地、SSR／接觸器、保險與散熱額定。</li>
+                <li>台灣一般插座／延長線常見額定上限為 <strong>15A</strong>；本工具以 15A 作為一般用電警戒參考。<strong>這不是所有 220V 專用迴路的法定上限，也不代表低於 15A 就一定安全。</strong></li>
+                <li>「保守模式」會用較低的電熱絲表面負載作起算，並對開關式控制再保留餘裕；它仍不是原廠選型保證。「進階模式」的允許表面負載由使用者自行設定與判斷。</li>
+                <li>最終製作前，請以實際線材原廠資料、現場電路額定與實測阻值交叉確認。<strong>在法律允許範圍內，設計者不對因使用或依賴本工具所造成的人身、財產、設備或其他損失負責。</strong></li>
+            </ul>
+            <div class="mt-2 text-[10px] text-red-700">
+                公開資料參考：
+                <a href="https://www.bsmi.gov.tw/wSite/ct?ctNode=4538&xItem=40672" target="_blank" rel="noopener noreferrer" class="underline">經濟部標準檢驗局－用電安全</a>
+                ·
+                <a href="https://www.kanthal.com/en/knowledge-hub/heating-material-knowledge/design-calculations-and-standard-tolerances/design-calculations/" target="_blank" rel="noopener noreferrer" class="underline">Kanthal－Heating Element Design</a>
+            </div>
+        </div>
 
         <div class="space-y-4">
             <!-- 窯爐容量輸入與幾何換算 -->
@@ -93,6 +121,9 @@
                 <!-- 模式 0: 直接輸入公升數 -->
                 <div id="vol_direct_div">
                     <input type="number" id="volume" class="input-field" placeholder="例如: 30" min="1" step="1" value="30">
+                    <p class="text-[11px] text-gray-500 mt-1.5">
+                        僅輸入公升數時，內表面積會以「等體積正方體」估算；狹長、扁平或特殊形狀窯爐請改用上方實際幾何模式。
+                    </p>
                 </div>
 
                 <!-- 模式 1: 四方立方體 (長寬高) -->
@@ -318,7 +349,7 @@
                 散熱量與壁厚成反比。若使用薄型陶瓷纖維壁（如 3-5 cm），在 1200°C 高溫時熱散失極快，必須提升 20%~30% 瓦數才能順利攻頂升溫。</p>
 
                 <p><strong>3. 歐森表面積法則（Fred Olsen Rule）：</strong><br>
-                陶藝工程中最準確的估算法。改用「內表面積（cm²）」來乘以固定功率密度（如 0.85 W/cm²），能自動調和形狀狹長或微型窯爐的功率需求！</p>
+                陶藝窯爐設計常用的經驗起算方法之一。以「內表面積（cm²）」乘以經驗功率密度（如 0.85 W/cm²）估算功率，可比單純 W/L 更能反映不同形狀的表面積差異；仍需依保溫、最高溫與升溫需求修正。</p>
             </div>
 
             <!-- 電壓輸入 -->
@@ -353,14 +384,14 @@
                 <!-- 模式 1: 預設材質 -->
                 <div id="rho_preset_div">
                     <select id="material" class="input-field">
-                        <option value="1.4">康泰爾 (Kanthal) - ρ=1.4</option>
+                        <option value="1.45">康泰爾 A-1 (Kanthal A-1) - ρ≈1.45 @20°C</option>
                         <option value="1.1">鎳鉻合金 (Nichrome) - ρ=1.1</option>
                     </select>
                 </div>
 
                 <!-- 模式 2: 手動輸入 -->
                 <div id="rho_custom_div" class="hidden">
-                    <input type="number" id="custom_rho" class="input-field" placeholder="例如: 1.2" min="0.1" step="0.01" value="1.4">
+                    <input type="number" id="custom_rho" class="input-field" placeholder="例如: 1.2" min="0.1" step="0.01" value="1.45">
                 </div>
 
                 <!-- 模式 3: 實測換算 -->
@@ -373,13 +404,72 @@
                         </div>
                         <div class="w-1/2">
                             <label class="text-xs text-gray-600 block mb-1">實測阻值 (Ω)</label>
-                            <input type="number" id="measure_R" class="input-field px-2 py-1.5 text-sm" value="1.78" step="0.1" min="0.1">
+                            <input type="number" id="measure_R" class="input-field px-2 py-1.5 text-sm" value="1.85" step="0.1" min="0.1">
                         </div>
                     </div>
                     <div class="text-sm text-blue-700 font-medium bg-blue-50 p-1.5 rounded text-center">
-                        換算電阻率 ρ = <span id="calc_rho_display">1.40</span>
+                        換算電阻率 ρ = <span id="calc_rho_display">1.45</span>
                     </div>
                 </div>
+            </div>
+
+            <!-- 電熱絲設計安全檢查 -->
+            <div class="input-group p-3.5 bg-slate-50 border border-slate-300 rounded-lg">
+                <label class="input-label font-bold text-slate-900 mb-2">🔥 電熱絲設計檢查</label>
+
+                <div class="flex flex-wrap gap-4 mb-3 text-xs text-gray-800">
+                    <label class="flex items-center cursor-pointer">
+                        <input type="radio" name="element_design_mode" value="safe" class="mr-1.5" checked>
+                        <span><strong>保守模式</strong>（預設）</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer">
+                        <input type="radio" name="element_design_mode" value="advanced" class="mr-1.5">
+                        <span><strong>進階模式</strong>（自行判斷）</span>
+                    </label>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+                    <div>
+                        <label class="text-xs text-gray-700 font-medium block mb-1">相同電壓並聯的加熱支路數</label>
+                        <input type="number" id="element_branches" class="input-field px-2 py-1.5 text-sm" value="1" min="1" max="12" step="1">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-700 font-medium block mb-1">電熱絲安裝方式</label>
+                        <select id="element_mount" class="input-field text-xs py-1.5">
+                            <option value="groove" selected>爐磚溝槽內螺旋線</option>
+                            <option value="tube">陶瓷管上螺旋線</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <label class="text-xs text-gray-700 font-medium block mb-1">功率控制方式</label>
+                    <select id="element_control" class="input-field text-xs py-1.5">
+                        <option value="onoff" selected>繼電器／SSR 時間比例開關（保守 -20%）</option>
+                        <option value="thyristor">連續／晶閘管功率控制（依原廠曲線）</option>
+                    </select>
+                </div>
+
+                <div id="advanced_surface_div" class="hidden mt-2 p-2.5 bg-white border border-slate-200 rounded">
+                    <label class="text-xs text-gray-700 font-medium flex justify-between items-center">
+                        <span>自行設定允許表面負載</span>
+                        <span class="flex items-center">
+                            <input type="number" id="custom_surface_limit" class="input-field px-2 py-1 text-xs w-24 text-right mr-1" value="2.0" min="0.1" max="20" step="0.1">
+                            W/cm²
+                        </span>
+                    </label>
+                    <p class="text-[10px] text-amber-700 mt-1">
+                        這個值完全由使用者負責判斷；應依線材材質、爐溫、線徑、安裝型式與原廠曲線設定。
+                    </p>
+                </div>
+
+                <div id="surface-limit-note" class="mt-2 text-[11px] text-slate-600 bg-white border border-slate-200 rounded p-2">
+                    保守模式會依最高溫與控制方式產生較低的表面負載警戒值；此數值是設計起算值，不是安全認證。
+                </div>
+
+                <p class="text-[10px] text-gray-500 mt-2">
+                    「支路數」指每一支電熱絲都接在相同供應電壓、並聯且平均分配總功率。若你的接法不是這種拓撲，請不要直接套用本計算。
+                </p>
             </div>
 
             <!-- 捲繞圓棒直徑輸入 -->
@@ -395,46 +485,91 @@
         <!-- 計算結果顯示區域 -->
         <div class="result-box">
             <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">計算結果</h2>
-            
+
             <div class="result-item">
                 <span class="result-label">估算總功率 (P):</span>
                 <span class="result-value"><span id="res-power">0</span> W</span>
             </div>
-            
+
             <div class="result-item">
-                <span class="result-label">電流 (I):</span>
+                <span class="result-label">供電總電流 (I):</span>
                 <span class="result-value"><span id="res-current">0.00</span> A</span>
             </div>
-            
+
             <div class="result-item">
-                <span class="result-label">總電阻 (R):</span>
+                <span class="result-label">等效總電阻 (R<sub>eq</sub>):</span>
                 <span class="result-value"><span id="res-resistance">0.00</span> Ω</span>
             </div>
 
             <div class="result-item">
-                <span class="result-label">導線截面積 (S):</span>
-                <span class="result-value"><span id="res-area">0.00</span> mm²</span>
+                <span class="result-label">加熱支路數:</span>
+                <span class="result-value"><span id="res-branches">1</span> 路</span>
             </div>
 
-            <div class="result-item text-blue-600 bg-blue-50 p-2 rounded -mx-2 mt-2">
-                <span class="result-label font-bold">所需導線總長度 (L):</span>
+            <div class="result-item">
+                <span class="result-label">每支路功率:</span>
+                <span class="result-value"><span id="res-branch-power">0</span> W</span>
+            </div>
+
+            <div class="result-item">
+                <span class="result-label">每支路電流:</span>
+                <span class="result-value"><span id="res-branch-current">0.00</span> A</span>
+            </div>
+
+            <div class="result-item">
+                <span class="result-label">每支路電阻:</span>
+                <span class="result-value"><span id="res-branch-resistance">0.00</span> Ω</span>
+            </div>
+
+            <div class="result-item">
+                <span class="result-label">導線截面積 (S):</span>
+                <span class="result-value"><span id="res-area">0.000</span> mm²</span>
+            </div>
+
+            <div class="result-item text-blue-700 bg-blue-50 p-2 rounded -mx-2 mt-2">
+                <span class="result-label font-bold">每支路所需導線長度:</span>
                 <span class="result-value font-bold text-lg"><span id="res-length">0.00</span> m</span>
             </div>
 
-            <!-- 圈數與密繞長度顯示 -->
+            <div class="result-item">
+                <span class="result-label">全部支路導線總長:</span>
+                <span class="result-value"><span id="res-total-wire-length">0.00</span> m</span>
+            </div>
+
             <div class="result-item text-green-700 bg-green-50 p-2 rounded -mx-2 mt-2">
-                <span class="result-label font-bold">線圈圈數 (N):</span>
+                <span class="result-label font-bold">每支路線圈圈數:</span>
                 <span class="result-value font-bold text-lg"><span id="res-turns">0</span> 圈</span>
             </div>
-            
+
             <div class="result-item text-green-700 bg-green-50 p-2 rounded -mx-2 mt-2">
-                <span class="result-label font-bold">剛繞好的密繞總長度:</span>
+                <span class="result-label font-bold">每支路剛繞好的密繞長度:</span>
                 <span class="result-value font-bold text-lg"><span id="res-coil-length">0.0</span> cm</span>
             </div>
+
+            <div class="result-item">
+                <span class="result-label">線圈外徑 / 線徑比:</span>
+                <span class="result-value"><span id="res-coil-ratio">0.0</span> × d</span>
+            </div>
+
+            <div id="surface-status-box" class="mt-4 p-3 rounded-lg border text-sm">
+                <div class="font-bold mb-2">電熱絲表面負載檢查</div>
+                <div class="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+                    <span>目前表面負載</span><strong class="text-right"><span id="res-surface-load">0.00</span> W/cm²</strong>
+                    <span>目前警戒／自訂上限</span><strong class="text-right"><span id="res-surface-limit">0.00</span> W/cm²</strong>
+                    <span>建議最小線徑</span><strong class="text-right">≥ <span id="res-min-diameter">0.0</span> mm</strong>
+                    <span>以建議線徑計算，每支路約</span><strong class="text-right"><span id="res-rec-length">0.00</span> m</strong>
+                </div>
+                <p id="surface-status-text" class="mt-2 text-xs"></p>
+            </div>
+
+            <div id="current-warning-box" class="mt-3 p-3 rounded-lg border text-xs"></div>
+            <div id="geometry-warning-box" class="mt-3 p-3 rounded-lg border text-xs"></div>
         </div>
-        
-        <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
-            <strong>注意：</strong> 算出的「密繞長度」是剛繞好、圈圈緊貼時的長度。實際安裝到窯爐時，通常需要將線圈拉開（拉長約 2~3 倍），以避免散熱不良導致燒斷。若要製作兩個電路，請將總圈數平分。
+
+        <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-900 leading-relaxed">
+            <strong>線圈幾何提醒：</strong>
+            「密繞長度」只是剛繞製完成時的軸向長度。實際節距／拉伸量必須依線徑、線圈外徑、溝槽或陶瓷支撐方式與最高工作溫度決定，
+            不應把固定「拉長 2～3 倍」當成通用規則。多支路時，本工具已分別重算每支路電阻、線長與圈數，請勿再自行把單一路結果直接除以支路數。
         </div>
     </div>
 
@@ -498,6 +633,15 @@
             const rodDiameterInput = document.getElementById('rod-diameter');
             const powerAdvice = document.getElementById('power-advice');
 
+            // 電熱絲設計檢查 DOM
+            const elementDesignRadios = document.querySelectorAll('input[name="element_design_mode"]');
+            const elementBranchesInput = document.getElementById('element_branches');
+            const elementMountSelect = document.getElementById('element_mount');
+            const elementControlSelect = document.getElementById('element_control');
+            const advancedSurfaceDiv = document.getElementById('advanced_surface_div');
+            const customSurfaceLimitInput = document.getElementById('custom_surface_limit');
+            const surfaceLimitNote = document.getElementById('surface-limit-note');
+
             // 電阻率 DOM
             const materialSelect = document.getElementById('material');
             const rhoRadios = document.querySelectorAll('input[name="rho_mode"]');
@@ -513,16 +657,30 @@
             const resPower = document.getElementById('res-power');
             const resCurrent = document.getElementById('res-current');
             const resResistance = document.getElementById('res-resistance');
+            const resBranches = document.getElementById('res-branches');
+            const resBranchPower = document.getElementById('res-branch-power');
+            const resBranchCurrent = document.getElementById('res-branch-current');
+            const resBranchResistance = document.getElementById('res-branch-resistance');
             const resArea = document.getElementById('res-area');
             const resLength = document.getElementById('res-length');
+            const resTotalWireLength = document.getElementById('res-total-wire-length');
             const resTurns = document.getElementById('res-turns');
             const resCoilLength = document.getElementById('res-coil-length');
+            const resCoilRatio = document.getElementById('res-coil-ratio');
+            const resSurfaceLoad = document.getElementById('res-surface-load');
+            const resSurfaceLimit = document.getElementById('res-surface-limit');
+            const resMinDiameter = document.getElementById('res-min-diameter');
+            const resRecLength = document.getElementById('res-rec-length');
+            const surfaceStatusBox = document.getElementById('surface-status-box');
+            const surfaceStatusText = document.getElementById('surface-status-text');
+            const currentWarningBox = document.getElementById('current-warning-box');
+            const geometryWarningBox = document.getElementById('geometry-warning-box');
 
             // 當前推薦參數快照
             let currentRec = {
                 hotBrickValue: "1.0",
                 backupInsulValue: "0.95",
-                wireMaterialValue: "1.4"
+                wireMaterialValue: "1.45"
             };
 
             function updateVolUI() {
@@ -590,12 +748,12 @@
                     if (recBackupText) recBackupText.textContent = "加裝 25mm 陶瓷纖維毯";
                     if (recBackupDesc) recBackupDesc.textContent = "經典背襯，大幅降低外殼溫度與省電";
                     if (recWireText) recWireText.textContent = "康泰爾 Kanthal A1";
-                    if (recWireDesc) recWireDesc.textContent = "高溫抗氧化極佳，絕佳壽命 (ρ=1.4)";
+                    if (recWireDesc) recWireDesc.textContent = "高溫抗氧化極佳，高溫抗氧化佳；20°C 電阻率約 ρ=1.45";
 
                     currentRec = {
                         hotBrickValue: "1.0",
                         backupInsulValue: "0.95",
-                        wireMaterialValue: "1.4"
+                        wireMaterialValue: "1.45"
                     };
                 } else {
                     if (recTempTag) recTempTag.textContent = `${temp}°C Cone 10 高溫瓷器`;
@@ -603,35 +761,90 @@
                     if (recBrickDesc) recBrickDesc.textContent = "耐溫 1430°C，結構強且高溫耐燒";
                     if (recBackupText) recBackupText.textContent = "加裝 25mm~50mm 雙層絕熱";
                     if (recBackupDesc) recBackupDesc.textContent = "1300°C高溫散熱快，強烈建議加厚背襯";
-                    if (recWireText) recWireText.textContent = "必須使用 Kanthal A1 康泰爾";
-                    if (recWireDesc) recWireDesc.textContent = "1300°C 鎳鉻合金會快速熔斷，限用康泰爾";
+                    if (recWireText) recWireText.textContent = "優先使用 Kanthal A-1 / 高溫 FeCrAl";
+                    if (recWireDesc) recWireDesc.textContent = "1300°C 等級需依元件溫度、安裝型式與原廠曲線驗證";
 
                     currentRec = {
                         hotBrickValue: "1.08",
                         backupInsulValue: "0.82",
-                        wireMaterialValue: "1.4"
+                        wireMaterialValue: "1.45"
                     };
                 }
+            }
+
+            function getTargetTemperature() {
+                if (targetTempPreset && targetTempPreset.value !== 'custom') {
+                    return parseFloat(targetTempPreset.value) || 1220;
+                }
+                return parseFloat(targetTempInput ? targetTempInput.value : 1220) || 1220;
+            }
+
+            function getConservativeSurfaceLimit(temp, controlMode) {
+                // deliberately conservative reference curve.
+                // Kanthal furnace data gives roughly 3–4 W/cm² at 1000°C for spiral elements
+                // in grooves / on ceramic tubes. This tool derates further as furnace temperature rises.
+                let limit = 3.0;
+                if (temp > 1000 && temp <= 1100) limit = 2.5;
+                else if (temp > 1100 && temp <= 1200) limit = 2.0;
+                else if (temp > 1200 && temp <= 1250) limit = 1.6;
+                else if (temp > 1250) limit = 1.3;
+
+                // Kanthal notes that on-off control should use about 20% lower surface load
+                if (controlMode === 'onoff') limit *= 0.8;
+                return limit;
+            }
+
+            function updateElementDesignUI() {
+                const mode = document.querySelector('input[name="element_design_mode"]:checked')?.value || 'safe';
+                advancedSurfaceDiv?.classList.toggle('hidden', mode !== 'advanced');
+                calculate();
+            }
+
+            function setStatusBox(el, level, htmlText) {
+                if (!el) return;
+                const classes = {
+                    good: 'mt-3 p-3 rounded-lg border text-xs bg-emerald-50 border-emerald-200 text-emerald-900',
+                    warn: 'mt-3 p-3 rounded-lg border text-xs bg-amber-50 border-amber-300 text-amber-950',
+                    danger: 'mt-3 p-3 rounded-lg border text-xs bg-red-50 border-red-300 text-red-950',
+                    info: 'mt-3 p-3 rounded-lg border text-xs bg-slate-50 border-slate-200 text-slate-800'
+                };
+                el.className = classes[level] || classes.info;
+                el.innerHTML = htmlText;
             }
 
             function clearResults() {
                 if (resPower) resPower.textContent = "0";
                 if (resCurrent) resCurrent.textContent = "0.00";
                 if (resResistance) resResistance.textContent = "0.00";
-                if (resArea) resArea.textContent = "0.00";
+                if (resBranches) resBranches.textContent = "1";
+                if (resBranchPower) resBranchPower.textContent = "0";
+                if (resBranchCurrent) resBranchCurrent.textContent = "0.00";
+                if (resBranchResistance) resBranchResistance.textContent = "0.00";
+                if (resArea) resArea.textContent = "0.000";
                 if (resLength) resLength.textContent = "0.00";
+                if (resTotalWireLength) resTotalWireLength.textContent = "0.00";
                 if (resTurns) resTurns.textContent = "0";
                 if (resCoilLength) resCoilLength.textContent = "0.0";
+                if (resCoilRatio) resCoilRatio.textContent = "0.0";
+                if (resSurfaceLoad) resSurfaceLoad.textContent = "0.00";
+                if (resSurfaceLimit) resSurfaceLimit.textContent = "0.00";
+                if (resMinDiameter) resMinDiameter.textContent = "0.0";
+                if (resRecLength) resRecLength.textContent = "0.00";
+                if (surfaceStatusText) surfaceStatusText.textContent = "";
+                if (surfaceStatusBox) surfaceStatusBox.className = "mt-4 p-3 rounded-lg border text-sm bg-slate-50 border-slate-200";
+                setStatusBox(currentWarningBox, 'info', '請輸入有效參數後查看供電電流警告。');
+                setStatusBox(geometryWarningBox, 'info', '請輸入有效參數後查看線圈幾何與材料提示。');
             }
 
             function calculate() {
                 let V = 0; // 公升 (L)
-                let innerSurfaceArea = 0; // 平方公分 (cm²)
+                let innerSurfaceArea = 0; // cm²
                 const volMode = document.querySelector('input[name="vol_mode"]:checked')?.value || 'direct';
 
                 if (volMode === 'direct') {
                     V = parseFloat(volumeInput ? volumeInput.value : 0) || 0;
                     if (V > 0) {
+                        // no geometry was provided, so estimate with an equal-volume cube.
                         const side = Math.cbrt(V * 1000);
                         innerSurfaceArea = 6 * Math.pow(side, 2);
                     }
@@ -678,20 +891,21 @@
                 const U = parseFloat(voltageInput ? voltageInput.value : 0);
                 const D = parseFloat(diameterInput ? diameterInput.value : 0);
                 const D_rod = parseFloat(rodDiameterInput ? rodDiameterInput.value : 0);
+                const branches = Math.max(1, Math.round(parseFloat(elementBranchesInput ? elementBranchesInput.value : 1) || 1));
 
                 let rho = 0;
                 const rhoMode = document.querySelector('input[name="rho_mode"]:checked')?.value || 'preset';
-                
+
                 if (rhoMode === 'preset') {
-                    rho = parseFloat(materialSelect ? materialSelect.value : 1.4);
+                    rho = parseFloat(materialSelect ? materialSelect.value : 1.45);
                 } else if (rhoMode === 'custom') {
-                    rho = parseFloat(customRhoInput ? customRhoInput.value : 1.4);
+                    rho = parseFloat(customRhoInput ? customRhoInput.value : 1.45);
                 } else if (rhoMode === 'measure') {
                     const mL = parseFloat(measureLInput ? measureLInput.value : 0);
                     const mR = parseFloat(measureRInput ? measureRInput.value : 0);
                     if (mL > 0 && mR > 0 && D > 0) {
-                        const S = (Math.PI * Math.pow(D, 2)) / 4;
-                        rho = (mR * S) / mL;
+                        const Smeasure = (Math.PI * Math.pow(D, 2)) / 4;
+                        rho = (mR * Smeasure) / mL;
                         if (calcRhoDisplay) calcRhoDisplay.textContent = rho.toFixed(3);
                     } else {
                         if (calcRhoDisplay) calcRhoDisplay.textContent = "---";
@@ -699,7 +913,10 @@
                     }
                 }
 
-                if (isNaN(V) || isNaN(U) || isNaN(D) || isNaN(D_rod) || isNaN(rho) || V <= 0 || U <= 0 || D <= 0 || D_rod <= 0 || rho <= 0) {
+                if (
+                    isNaN(V) || isNaN(U) || isNaN(D) || isNaN(D_rod) || isNaN(rho) ||
+                    V <= 0 || U <= 0 || D <= 0 || D_rod <= 0 || rho <= 0 || branches < 1
+                ) {
                     clearResults();
                     return;
                 }
@@ -713,7 +930,7 @@
                     P = innerSurfaceArea * density * safetyMargin;
                     const equivalentWPerL = V > 0 ? (P / V).toFixed(1) : "0.0";
                     if (powerAdvice) {
-                        powerAdvice.textContent = `*根據內表面積 (${Math.round(innerSurfaceArea)} cm²) 計算：相當於 ${equivalentWPerL} W/公升 (含 ${safetyMargin}x 餘裕)`;
+                        powerAdvice.textContent = `*依內表面積 ${Math.round(innerSurfaceArea)} cm² × ${density} W/cm² 估算：相當於 ${equivalentWPerL} W/L（含 ${safetyMargin}x 功率餘裕）`;
                     }
                 } else if (powerEvalMode === 'volume') {
                     let baseWPerL = 85;
@@ -724,39 +941,190 @@
 
                     const hotFactor = parseFloat(hotBrickSelect ? hotBrickSelect.value : 1.0) || 1.0;
                     const backupFactor = parseFloat(backupInsulSelect ? backupInsulSelect.value : 0.95) || 0.95;
-
                     P = V * baseWPerL * hotFactor * backupFactor * safetyMargin;
+
                     if (powerAdvice) {
-                        powerAdvice.textContent = `*基於容量 ${V.toFixed(1)}L (${baseWPerL}W/L) 搭配磚材/背襯修正算得 (含 ${safetyMargin}x 餘裕)`;
+                        powerAdvice.textContent = `*容量法：${V.toFixed(1)} L × ${baseWPerL} W/L × 材料修正（含 ${safetyMargin}x 功率餘裕）`;
                     }
                 } else {
                     const customP = parseFloat(customPowerInput ? customPowerInput.value : 2500) || 2500;
                     P = customP * safetyMargin;
                     if (powerAdvice) {
-                        powerAdvice.textContent = `*使用手動指定瓦數 ${customP} W (含 ${safetyMargin}x 餘裕 = ${Math.round(P)} W)`;
+                        powerAdvice.textContent = `*手動指定 ${customP} W × ${safetyMargin}x = ${Math.round(P)} W`;
                     }
                 }
 
-                // 電氣與導線幾何計算
-                const I = P / U;
-                const R = Math.pow(U, 2) / P;
-                const S = (Math.PI * Math.pow(D, 2)) / 4;
-                const L = (S * R) / rho;
+                if (!(P > 0)) {
+                    clearResults();
+                    return;
+                }
 
-                // 繞圈計算 (平均直徑 = 心軸直徑 + 線徑)
+                // Supply / branch electrical values.
+                const I_total = P / U;
+                const R_eq = Math.pow(U, 2) / P;
+                const P_branch = P / branches;
+                const I_branch = P_branch / U;
+                const R_branch = Math.pow(U, 2) / P_branch; // identical branches in parallel
+
+                // Wire geometry using current user-selected diameter.
+                const S = (Math.PI * Math.pow(D, 2)) / 4;
+                const L_branch = (S * R_branch) / rho;
+                const L_total = L_branch * branches;
+
+                // Coil geometry. D_rod is mandrel diameter; centerline dia = mandrel + one wire dia.
                 const D_mean = D_rod + D;
                 const turnLengthMeters = (Math.PI * D_mean) / 1000;
-                const turns = L / turnLengthMeters;
-                const coilLengthCm = (turns * D) / 10;
+                const turns_branch = L_branch / turnLengthMeters;
+                const coilLengthCm = (turns_branch * D) / 10;
+                const outerCoilDiameter = D_rod + 2 * D;
+                const coilRatio = outerCoilDiameter / D;
 
-                // 渲染結果至畫面
+                // Surface load: wire lateral area = circumference × length.
+                const wireSurfaceAreaPerBranchCm2 = 10 * Math.PI * D * L_branch;
+                const totalWireSurfaceAreaCm2 = wireSurfaceAreaPerBranchCm2 * branches;
+                const actualSurfaceLoad = P / totalWireSurfaceAreaCm2;
+
+                // Safe / advanced design target.
+                const designMode = document.querySelector('input[name="element_design_mode"]:checked')?.value || 'safe';
+                const mountMode = elementMountSelect?.value || 'groove';
+                const controlMode = elementControlSelect?.value || 'onoff';
+                const targetTemp = getTargetTemperature();
+
+                let surfaceLimit = 0;
+                if (designMode === 'safe') {
+                    surfaceLimit = getConservativeSurfaceLimit(targetTemp, controlMode);
+                    if (surfaceLimitNote) {
+                        const controlText = controlMode === 'onoff'
+                            ? '開關式控制已額外降載約 20%'
+                            : '未套用開關式 -20% 降載';
+                        surfaceLimitNote.innerHTML =
+                            `目前保守警戒值：<strong>${surfaceLimit.toFixed(2)} W/cm²</strong>（目標爐溫 ${Math.round(targetTemp)}°C，${controlText}）。` +
+                            `此值是工具依公開爐用元件資料做的低側起算，不是原廠保證上限。`;
+                    }
+                } else {
+                    surfaceLimit = parseFloat(customSurfaceLimitInput ? customSurfaceLimitInput.value : 2.0) || 2.0;
+                    if (surfaceLimitNote) {
+                        surfaceLimitNote.innerHTML =
+                            `進階模式採用你自行設定的 <strong>${surfaceLimit.toFixed(2)} W/cm²</strong>。` +
+                            `符合這個數值只代表符合你的設計假設，不代表安全認證。`;
+                    }
+                }
+
+                // Minimum diameter needed to stay at/below the chosen surface-load target,
+                // given identical parallel branches at the same supply voltage.
+                const dMinExact = Math.cbrt(
+                    (0.4 * rho * Math.pow(P, 2)) /
+                    (Math.pow(U, 2) * Math.pow(Math.PI, 2) * surfaceLimit * Math.pow(branches, 2))
+                );
+                const dMinRounded = Math.ceil(dMinExact * 10) / 10;
+                const Srec = (Math.PI * Math.pow(dMinRounded, 2)) / 4;
+                const LrecBranch = (Srec * R_branch) / rho;
+
+                // Render core results.
                 if (resPower) resPower.textContent = Math.round(P);
-                if (resCurrent) resCurrent.textContent = I.toFixed(2);
-                if (resResistance) resResistance.textContent = R.toFixed(2);
+                if (resCurrent) resCurrent.textContent = I_total.toFixed(2);
+                if (resResistance) resResistance.textContent = R_eq.toFixed(2);
+                if (resBranches) resBranches.textContent = String(branches);
+                if (resBranchPower) resBranchPower.textContent = Math.round(P_branch);
+                if (resBranchCurrent) resBranchCurrent.textContent = I_branch.toFixed(2);
+                if (resBranchResistance) resBranchResistance.textContent = R_branch.toFixed(2);
                 if (resArea) resArea.textContent = S.toFixed(3);
-                if (resLength) resLength.textContent = L.toFixed(2);
-                if (resTurns) resTurns.textContent = Math.round(turns);
+                if (resLength) resLength.textContent = L_branch.toFixed(2);
+                if (resTotalWireLength) resTotalWireLength.textContent = L_total.toFixed(2);
+                if (resTurns) resTurns.textContent = Math.round(turns_branch);
                 if (resCoilLength) resCoilLength.textContent = coilLengthCm.toFixed(1);
+                if (resCoilRatio) resCoilRatio.textContent = coilRatio.toFixed(1);
+                if (resSurfaceLoad) resSurfaceLoad.textContent = actualSurfaceLoad.toFixed(2);
+                if (resSurfaceLimit) resSurfaceLimit.textContent = surfaceLimit.toFixed(2);
+                if (resMinDiameter) resMinDiameter.textContent = dMinRounded.toFixed(1);
+                if (resRecLength) resRecLength.textContent = LrecBranch.toFixed(2);
+
+                // Surface load status.
+                if (surfaceStatusBox) {
+                    if (actualSurfaceLoad <= surfaceLimit) {
+                        surfaceStatusBox.className = "mt-4 p-3 rounded-lg border text-sm bg-emerald-50 border-emerald-300 text-emerald-950";
+                        if (surfaceStatusText) {
+                            surfaceStatusText.innerHTML = designMode === 'safe'
+                                ? `目前計算值低於本工具的保守警戒值。仍需核對實際線材原廠資料與安裝條件。`
+                                : `目前計算值低於你自行設定的上限；這不代表本工具替你的上限值背書。`;
+                        }
+                    } else {
+                        surfaceStatusBox.className = "mt-4 p-3 rounded-lg border text-sm bg-red-50 border-red-300 text-red-950";
+                        if (surfaceStatusText) {
+                            surfaceStatusText.innerHTML =
+                                `<strong>超過目前表面負載上限。</strong> 不建議照此線徑直接製作。` +
+                                `可增加線徑、增加相同電壓的並聯加熱支路，或重新降低總功率。`;
+                        }
+                    }
+                }
+
+                // Taiwan general 15A reference warning.
+                if (I_total > 15) {
+                    setStatusBox(
+                        currentWarningBox,
+                        'danger',
+                        `<strong>⚠️ 供電總電流 ${I_total.toFixed(2)}A，已超過台灣一般插座／延長線常見 15A 額定參考。</strong><br>` +
+                        `若這些加熱支路共用同一上游電源，斷路器與上游配線看到的仍是約 ${I_total.toFixed(2)}A，` +
+                        `不能因每支路只有 ${I_branch.toFixed(2)}A 就視為低於 15A。` +
+                        `220V 專用迴路可能使用不同額定，但必須依現場斷路器、線徑、插座／端子與接觸器額定確認。`
+                    );
+                } else {
+                    setStatusBox(
+                        currentWarningBox,
+                        'warn',
+                        `<strong>供電總電流 ${I_total.toFixed(2)}A，未超過一般插座／延長線常見 15A 參考線。</strong><br>` +
+                        `這不等於確認安全；高溫設備仍須核對專用迴路的斷路器、配線、插座／端子與長時間負載能力。`
+                    );
+                }
+
+                // Geometry / material warnings.
+                const designWarnings = [];
+                const recommendedRatio = mountMode === 'groove' ? [5, 6] : [12, 14];
+                if (coilRatio < recommendedRatio[0] || coilRatio > recommendedRatio[1]) {
+                    designWarnings.push(
+                        `目前線圈外徑約為 <strong>${coilRatio.toFixed(1)}d</strong>；` +
+                        `${mountMode === 'groove' ? '爐磚溝槽螺旋線' : '陶瓷管螺旋線'}可先用約 ` +
+                        `<strong>${recommendedRatio[0]}–${recommendedRatio[1]}d</strong> 作公開資料的幾何參考，再依實際安裝調整。`
+                    );
+                }
+
+                if (designMode === 'safe' && D < 2.0) {
+                    designWarnings.push(
+                        `目前線徑 <strong>${D.toFixed(1)} mm</strong> 偏細；Kanthal 公開的爐用螺旋線參考表常見線徑從約 2 mm 起。` +
+                        `細線並非不能工作，但可承受的表面負載與機械穩定性要更保守。`
+                    );
+                }
+
+                if (mountMode === 'groove' && targetTemp > 1250) {
+                    designWarnings.push(
+                        `目標爐溫 ${Math.round(targetTemp)}°C 已高於 Kanthal 公開資料中「溝槽內螺旋線」常見的約 1250°C 爐溫等級；` +
+                        `請重新核對元件型式與原廠資料。`
+                    );
+                }
+
+                if (mountMode === 'tube' && targetTemp > 1300) {
+                    designWarnings.push(
+                        `目標爐溫 ${Math.round(targetTemp)}°C 已超過 Kanthal 公開資料中陶瓷管螺旋線常見的約 1300°C 爐溫等級。`
+                    );
+                }
+
+                if (rhoMode === 'preset' && materialSelect?.value === '1.1' && targetTemp > 1100) {
+                    designWarnings.push(
+                        `目前選擇鎳鉻合金，且目標爐溫為 ${Math.round(targetTemp)}°C。高溫區請不要只用電阻率決定材料，` +
+                        `需核對實際 NiCr 牌號的最高元件溫度、爐溫曲線與壽命資料。`
+                    );
+                }
+
+                designWarnings.push(
+                    `本計算使用你輸入／預設的電阻率 ρ=${rho.toFixed(3)} Ω·mm²/m。` +
+                    `高溫時電阻率會變化；最終線長建議以實際線材資料或實測阻值修正。`
+                );
+
+                setStatusBox(
+                    geometryWarningBox,
+                    designWarnings.length > 1 ? 'warn' : 'info',
+                    `<strong>線圈／材料檢查：</strong><ul class="list-disc pl-5 mt-1 space-y-1">${designWarnings.map(x => `<li>${x}</li>`).join('')}</ul>`
+                );
             }
 
             // 綁定「一鍵套用建議」按鈕
@@ -790,17 +1158,25 @@
             volRadios.forEach(radio => radio.addEventListener('change', updateVolUI));
             powerEvalRadios.forEach(radio => radio.addEventListener('change', updatePowerEvalUI));
             rhoRadios.forEach(radio => radio.addEventListener('change', updateRhoUI));
+            elementDesignRadios.forEach(radio => radio.addEventListener('change', updateElementDesignUI));
 
-            // 綁定溫度選單改變
-            targetTempPreset?.addEventListener('change', updateRecommendation);
-            targetTempInput?.addEventListener('input', updateRecommendation);
+            // 綁定溫度選單改變：推薦與安全檢查都要同步更新
+            targetTempPreset?.addEventListener('change', () => {
+                updateRecommendation();
+                calculate();
+            });
+            targetTempInput?.addEventListener('input', () => {
+                updateRecommendation();
+                calculate();
+            });
 
             // 綁定數值變動即時計算
             [
                 volumeInput, boxL, boxW, boxH, cylR, cylH, octS, octH, decS, decH,
                 olsenDensityInput, hotBrickSelect, backupInsulSelect, customPowerInput, safetyMarginSelect,
                 voltageInput, diameterInput, rodDiameterInput, materialSelect, customRhoInput,
-                measureLInput, measureRInput
+                measureLInput, measureRInput, elementBranchesInput, elementMountSelect,
+                elementControlSelect, customSurfaceLimitInput
             ].forEach(input => {
                 input?.addEventListener('input', calculate);
                 input?.addEventListener('change', calculate);
@@ -811,6 +1187,7 @@
             updatePowerEvalUI();
             updateRhoUI();
             updateRecommendation();
+            updateElementDesignUI();
             calculate();
         });
     </script>
