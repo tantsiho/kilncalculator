@@ -74,7 +74,7 @@
                 melocore
             </a>
             <span class="mx-1.5">·</span>
-            <span>v1.3.0</span>
+            <span>v1.4.0</span>
         </div>
 
         <div class="mb-5 p-4 bg-red-50 border border-red-300 rounded-lg text-xs text-red-950 leading-relaxed">
@@ -642,6 +642,106 @@
             「密繞長度」只是剛繞製完成時的軸向長度。實際節距／拉伸量必須依線徑、線圈外徑、溝槽或陶瓷支撐方式與最高工作溫度決定，
             不應把固定「拉長 2～3 倍」當成通用規則。多支路時，本工具已分別重算每支路電阻、線長與圈數，請勿再自行把單一路結果直接除以支路數。
         </div>
+
+        <!-- 既有窯／多區線圈並聯分析 -->
+        <div class="mt-6 p-4 bg-violet-50/60 border border-violet-200 rounded-xl">
+            <div class="flex flex-wrap items-start justify-between gap-2 mb-3">
+                <div>
+                    <h2 class="text-lg font-bold text-violet-950">🔌 既有窯／多區線圈並聯分析</h2>
+                    <p class="text-[11px] text-violet-800 mt-1 leading-relaxed">
+                        給已經有多組電熱絲、而且每組阻值不同的窯使用。每組都假設<strong>直接跨同一供電電壓並聯</strong>；
+                        若實際是串聯、串並聯、三相 Y／Δ，請不要套用這個區塊。
+                    </p>
+                </div>
+                <span class="text-[10px] font-bold bg-violet-100 text-violet-800 px-2 py-1 rounded-full">獨立分析工具</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+                <div>
+                    <label class="text-xs font-medium text-gray-700 block mb-1">分析供電電壓 (V)</label>
+                    <input type="number" id="multi_voltage" class="input-field py-1.5 text-sm" value="220" min="1" step="1">
+                </div>
+                <div class="flex items-end">
+                    <div class="w-full p-2 bg-white border border-violet-100 rounded text-[10px] text-gray-600 leading-relaxed">
+                        每組：<strong>I = U ÷ R</strong>、<strong>P = U² ÷ R</strong><br>
+                        總電流＝各組電流相加；總功率＝各組功率相加。
+                    </div>
+                </div>
+            </div>
+
+            <div id="multi-coil-list" class="space-y-2"></div>
+
+            <div class="flex flex-wrap gap-2 mt-3">
+                <button type="button" id="add-coil-btn" class="px-3 py-2 bg-violet-700 hover:bg-violet-800 text-white rounded text-xs font-medium">
+                    ＋ 新增線圈
+                </button>
+                <button type="button" id="reset-coils-btn" class="px-3 py-2 bg-white hover:bg-violet-50 text-violet-800 border border-violet-300 rounded text-xs font-medium">
+                    重設為 5 組
+                </button>
+            </div>
+
+            <div class="mt-4 bg-white border border-violet-200 rounded-lg p-3">
+                <h3 class="text-sm font-bold text-gray-800 mb-2">多區並聯結果</h3>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                    <div class="bg-gray-50 rounded p-2">
+                        <span class="text-[10px] text-gray-500 block">啟用線圈</span>
+                        <strong><span id="multi-active-count">0</span> 組</strong>
+                    </div>
+                    <div class="bg-gray-50 rounded p-2">
+                        <span class="text-[10px] text-gray-500 block">等效總阻值</span>
+                        <strong><span id="multi-eq-resistance">—</span> Ω</strong>
+                    </div>
+                    <div class="bg-gray-50 rounded p-2">
+                        <span class="text-[10px] text-gray-500 block">總電流</span>
+                        <strong><span id="multi-total-current">0.00</span> A</strong>
+                    </div>
+                    <div class="bg-gray-50 rounded p-2">
+                        <span class="text-[10px] text-gray-500 block">總功率</span>
+                        <strong><span id="multi-total-power">0</span> W</strong>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <div class="text-xs font-bold text-gray-700 mb-1.5">區域功率分配</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 text-xs">
+                        <div class="border rounded p-2">
+                            <span class="text-gray-500 block text-[10px]">上區</span>
+                            <strong><span id="multi-upper-power">0</span> W</strong>
+                            <span class="block text-[10px] text-gray-500"><span id="multi-upper-pct">0.0</span>%</span>
+                        </div>
+                        <div class="border rounded p-2">
+                            <span class="text-gray-500 block text-[10px]">中區</span>
+                            <strong><span id="multi-middle-power">0</span> W</strong>
+                            <span class="block text-[10px] text-gray-500"><span id="multi-middle-pct">0.0</span>%</span>
+                        </div>
+                        <div class="border rounded p-2">
+                            <span class="text-gray-500 block text-[10px]">下區</span>
+                            <strong><span id="multi-lower-power">0</span> W</strong>
+                            <span class="block text-[10px] text-gray-500"><span id="multi-lower-pct">0.0</span>%</span>
+                        </div>
+                        <div class="border rounded p-2">
+                            <span class="text-gray-500 block text-[10px]">其他</span>
+                            <strong><span id="multi-other-power">0</span> W</strong>
+                            <span class="block text-[10px] text-gray-500"><span id="multi-other-pct">0.0</span>%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="multi-balance-note" class="mt-3 p-2.5 rounded border bg-violet-50 border-violet-200 text-[11px] text-violet-950 leading-relaxed">
+                    填入各組實測阻值後，這裡會顯示上／中／下的實際功率分配。
+                </div>
+
+                <div id="multi-current-warning" class="mt-2 p-2.5 rounded border bg-slate-50 border-slate-200 text-[11px] text-slate-800 leading-relaxed">
+                    一般插座／延長線 15A 僅作台灣常見額定參考；大型窯通常是專用迴路，仍以實際斷路器、線徑與端子額定為準。
+                </div>
+            </div>
+
+            <div class="mt-3 text-[10px] text-gray-600 leading-relaxed">
+                <strong>注意：</strong> 功率比例不等於溫度比例。上蓋、底部、窯門、排氣孔、裝窯密度與熱電偶位置都會影響實際溫差；
+                這個區塊是把「原廠／現有線圈到底如何分配電力」量化出來，後續仍要用實際燒成溫差判斷是否需要調整。
+            </div>
+        </div>
     </div>
 
     <script>
@@ -756,6 +856,26 @@
             const currentWarningBox = document.getElementById('current-warning-box');
             const geometryWarningBox = document.getElementById('geometry-warning-box');
 
+            // 既有窯／多區線圈並聯分析 DOM
+            const multiVoltageInput = document.getElementById('multi_voltage');
+            const multiCoilList = document.getElementById('multi-coil-list');
+            const addCoilBtn = document.getElementById('add-coil-btn');
+            const resetCoilsBtn = document.getElementById('reset-coils-btn');
+            const multiActiveCount = document.getElementById('multi-active-count');
+            const multiEqResistance = document.getElementById('multi-eq-resistance');
+            const multiTotalCurrent = document.getElementById('multi-total-current');
+            const multiTotalPower = document.getElementById('multi-total-power');
+            const multiUpperPower = document.getElementById('multi-upper-power');
+            const multiMiddlePower = document.getElementById('multi-middle-power');
+            const multiLowerPower = document.getElementById('multi-lower-power');
+            const multiOtherPower = document.getElementById('multi-other-power');
+            const multiUpperPct = document.getElementById('multi-upper-pct');
+            const multiMiddlePct = document.getElementById('multi-middle-pct');
+            const multiLowerPct = document.getElementById('multi-lower-pct');
+            const multiOtherPct = document.getElementById('multi-other-pct');
+            const multiBalanceNote = document.getElementById('multi-balance-note');
+            const multiCurrentWarning = document.getElementById('multi-current-warning');
+
             // 當前推薦參數快照
             let currentRec = {
                 hotBrickValue: "1.0",
@@ -850,6 +970,230 @@
                         wireMaterialValue: "1.45"
                     };
                 }
+            }
+
+
+            const defaultMultiCoils = [
+                { name: '上 1', zone: 'upper', resistance: '' },
+                { name: '上 2', zone: 'upper', resistance: '' },
+                { name: '中',   zone: 'middle', resistance: '' },
+                { name: '下 1', zone: 'lower', resistance: '' },
+                { name: '下 2', zone: 'lower', resistance: '' }
+            ];
+
+            let multiCoils = defaultMultiCoils.map((coil, index) => ({
+                id: index + 1,
+                enabled: true,
+                name: coil.name,
+                zone: coil.zone,
+                resistance: coil.resistance
+            }));
+            let nextMultiCoilId = multiCoils.length + 1;
+
+            function escapeHtml(value) {
+                return String(value ?? '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
+            function zoneLabel(zone) {
+                if (zone === 'upper') return '上';
+                if (zone === 'middle') return '中';
+                if (zone === 'lower') return '下';
+                return '其他';
+            }
+
+            function renderMultiCoils() {
+                if (!multiCoilList) return;
+
+                multiCoilList.innerHTML = multiCoils.map((coil, index) => `
+                    <div class="multi-coil-row bg-white border border-violet-100 rounded-lg p-2.5" data-coil-id="${coil.id}">
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            <label class="flex items-center text-xs font-bold text-gray-700">
+                                <input type="checkbox" class="multi-enabled mr-1.5" ${coil.enabled ? 'checked' : ''}>
+                                線圈 ${index + 1}
+                            </label>
+                            <button type="button" class="remove-multi-coil text-[11px] text-red-600 hover:underline" ${multiCoils.length <= 1 ? 'disabled title="至少保留一組"' : ''}>
+                                移除
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            <div>
+                                <label class="text-[10px] text-gray-500 block mb-1">名稱</label>
+                                <input type="text" class="multi-name input-field px-2 py-1.5 text-xs" value="${escapeHtml(coil.name)}" placeholder="例如 上1">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-500 block mb-1">區域</label>
+                                <select class="multi-zone input-field px-2 py-1.5 text-xs">
+                                    <option value="upper" ${coil.zone === 'upper' ? 'selected' : ''}>上</option>
+                                    <option value="middle" ${coil.zone === 'middle' ? 'selected' : ''}>中</option>
+                                    <option value="lower" ${coil.zone === 'lower' ? 'selected' : ''}>下</option>
+                                    <option value="other" ${coil.zone === 'other' ? 'selected' : ''}>其他</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-500 block mb-1">實測阻值 (Ω)</label>
+                                <input type="number" class="multi-resistance input-field px-2 py-1.5 text-xs" value="${escapeHtml(coil.resistance)}" min="0.01" step="0.01" placeholder="例如 12.5">
+                            </div>
+                            <div class="bg-violet-50 rounded p-2">
+                                <span class="text-[10px] text-gray-500 block">即時計算</span>
+                                <strong class="block text-xs"><span class="multi-row-current">—</span> A</strong>
+                                <strong class="block text-xs"><span class="multi-row-power">—</span> W</strong>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                multiCoilList.querySelectorAll('.multi-coil-row').forEach(row => {
+                    const id = Number(row.dataset.coilId);
+                    const getCoil = () => multiCoils.find(c => c.id === id);
+
+                    row.querySelector('.multi-enabled')?.addEventListener('change', (e) => {
+                        const coil = getCoil();
+                        if (coil) coil.enabled = e.target.checked;
+                        calculateMultiCoils();
+                    });
+
+                    row.querySelector('.multi-name')?.addEventListener('input', (e) => {
+                        const coil = getCoil();
+                        if (coil) coil.name = e.target.value;
+                    });
+
+                    row.querySelector('.multi-zone')?.addEventListener('change', (e) => {
+                        const coil = getCoil();
+                        if (coil) coil.zone = e.target.value;
+                        calculateMultiCoils();
+                    });
+
+                    row.querySelector('.multi-resistance')?.addEventListener('input', (e) => {
+                        const coil = getCoil();
+                        if (coil) coil.resistance = e.target.value;
+                        calculateMultiCoils();
+                    });
+
+                    row.querySelector('.remove-multi-coil')?.addEventListener('click', () => {
+                        if (multiCoils.length <= 1) return;
+                        multiCoils = multiCoils.filter(c => c.id !== id);
+                        renderMultiCoils();
+                        calculateMultiCoils();
+                    });
+                });
+
+                calculateMultiCoils();
+            }
+
+            function calculateMultiCoils() {
+                const U = parseFloat(multiVoltageInput?.value || 0);
+                const zonePower = { upper: 0, middle: 0, lower: 0, other: 0 };
+                let totalCurrent = 0;
+                let totalPower = 0;
+                let activeCount = 0;
+                let reciprocalSum = 0;
+
+                multiCoilList?.querySelectorAll('.multi-coil-row').forEach(row => {
+                    const id = Number(row.dataset.coilId);
+                    const coil = multiCoils.find(c => c.id === id);
+                    const currentEl = row.querySelector('.multi-row-current');
+                    const powerEl = row.querySelector('.multi-row-power');
+
+                    if (!coil || !coil.enabled || !(U > 0)) {
+                        if (currentEl) currentEl.textContent = '—';
+                        if (powerEl) powerEl.textContent = '—';
+                        return;
+                    }
+
+                    const R = parseFloat(coil.resistance);
+                    if (!(R > 0)) {
+                        if (currentEl) currentEl.textContent = '—';
+                        if (powerEl) powerEl.textContent = '—';
+                        return;
+                    }
+
+                    const I = U / R;
+                    const P = (U * U) / R;
+
+                    activeCount += 1;
+                    totalCurrent += I;
+                    totalPower += P;
+                    reciprocalSum += 1 / R;
+                    zonePower[coil.zone] = (zonePower[coil.zone] || 0) + P;
+
+                    if (currentEl) currentEl.textContent = I.toFixed(2);
+                    if (powerEl) powerEl.textContent = Math.round(P);
+                });
+
+                const Req = reciprocalSum > 0 ? 1 / reciprocalSum : null;
+
+                if (multiActiveCount) multiActiveCount.textContent = String(activeCount);
+                if (multiEqResistance) multiEqResistance.textContent = Req ? Req.toFixed(2) : '—';
+                if (multiTotalCurrent) multiTotalCurrent.textContent = totalCurrent.toFixed(2);
+                if (multiTotalPower) multiTotalPower.textContent = Math.round(totalPower);
+
+                const renderZone = (powerEl, pctEl, value) => {
+                    if (powerEl) powerEl.textContent = Math.round(value);
+                    if (pctEl) pctEl.textContent = totalPower > 0 ? ((value / totalPower) * 100).toFixed(1) : '0.0';
+                };
+
+                renderZone(multiUpperPower, multiUpperPct, zonePower.upper);
+                renderZone(multiMiddlePower, multiMiddlePct, zonePower.middle);
+                renderZone(multiLowerPower, multiLowerPct, zonePower.lower);
+                renderZone(multiOtherPower, multiOtherPct, zonePower.other);
+
+                if (multiBalanceNote) {
+                    if (totalPower > 0) {
+                        const u = zonePower.upper / totalPower * 100;
+                        const m = zonePower.middle / totalPower * 100;
+                        const l = zonePower.lower / totalPower * 100;
+
+                        const parts = [];
+                        if (zonePower.upper > 0) parts.push(`上區 ${u.toFixed(1)}%`);
+                        if (zonePower.middle > 0) parts.push(`中區 ${m.toFixed(1)}%`);
+                        if (zonePower.lower > 0) parts.push(`下區 ${l.toFixed(1)}%`);
+                        if (zonePower.other > 0) parts.push(`其他 ${(zonePower.other / totalPower * 100).toFixed(1)}%`);
+
+                        multiBalanceNote.innerHTML =
+                            `<strong>目前功率分配：</strong>${parts.join('｜')}。` +
+                            `<br>這代表電力配置，不代表實際爐內溫度比例；要判斷上中下溫差，仍需搭配實燒與測溫結果。`;
+                    } else {
+                        multiBalanceNote.textContent = '填入各組實測阻值後，這裡會顯示上／中／下的實際功率分配。';
+                    }
+                }
+
+                if (multiCurrentWarning) {
+                    if (!(U > 0)) {
+                        multiCurrentWarning.className = 'mt-2 p-2.5 rounded border bg-red-50 border-red-300 text-[11px] text-red-900 leading-relaxed';
+                        multiCurrentWarning.innerHTML = '<strong>請輸入有效供電電壓。</strong>';
+                    } else if (totalCurrent > 15) {
+                        multiCurrentWarning.className = 'mt-2 p-2.5 rounded border bg-red-50 border-red-300 text-[11px] text-red-950 leading-relaxed';
+                        multiCurrentWarning.innerHTML =
+                            `<strong>⚠️ 合計電流 ${totalCurrent.toFixed(2)}A，超過台灣一般插座／延長線常見 15A 額定參考。</strong>` +
+                            ` 大型窯通常使用專用迴路，因此這不是判定違規或不安全的單一標準；仍須以實際斷路器、線徑、接點與端子額定核對。`;
+                    } else if (totalPower > 0) {
+                        multiCurrentWarning.className = 'mt-2 p-2.5 rounded border bg-amber-50 border-amber-300 text-[11px] text-amber-950 leading-relaxed';
+                        multiCurrentWarning.innerHTML =
+                            `合計電流 ${totalCurrent.toFixed(2)}A，未超過一般 15A 參考線；` +
+                            `但高溫設備仍應以實際專用迴路設計與長時間負載能力判斷。`;
+                    } else {
+                        multiCurrentWarning.className = 'mt-2 p-2.5 rounded border bg-slate-50 border-slate-200 text-[11px] text-slate-800 leading-relaxed';
+                        multiCurrentWarning.textContent = '一般插座／延長線 15A 僅作台灣常見額定參考；大型窯通常是專用迴路，仍以實際斷路器、線徑與端子額定為準。';
+                    }
+                }
+            }
+
+            function resetMultiCoils() {
+                multiCoils = defaultMultiCoils.map((coil, index) => ({
+                    id: index + 1,
+                    enabled: true,
+                    name: coil.name,
+                    zone: coil.zone,
+                    resistance: coil.resistance
+                }));
+                nextMultiCoilId = multiCoils.length + 1;
+                renderMultiCoils();
             }
 
             function getTargetTemperature() {
@@ -1316,6 +1660,24 @@
             toggleGuideBtn?.addEventListener('click', () => thermalGuideBox?.classList.toggle('hidden'));
             closeGuideBtn?.addEventListener('click', () => thermalGuideBox?.classList.add('hidden'));
 
+            // 既有窯／多區線圈並聯分析
+            multiVoltageInput?.addEventListener('input', calculateMultiCoils);
+            multiVoltageInput?.addEventListener('change', calculateMultiCoils);
+
+            addCoilBtn?.addEventListener('click', () => {
+                if (multiCoils.length >= 12) return;
+                multiCoils.push({
+                    id: nextMultiCoilId++,
+                    enabled: true,
+                    name: `線圈 ${multiCoils.length + 1}`,
+                    zone: 'other',
+                    resistance: ''
+                });
+                renderMultiCoils();
+            });
+
+            resetCoilsBtn?.addEventListener('click', resetMultiCoils);
+
             // 綁定模式 Radio 切換
             volRadios.forEach(radio => radio.addEventListener('change', updateVolUI));
             powerEvalRadios.forEach(radio => radio.addEventListener('change', updatePowerEvalUI));
@@ -1351,6 +1713,7 @@
             updateRecommendation();
             updateElementDesignUI();
             calculate();
+            renderMultiCoils();
         });
     </script>
 </body>
