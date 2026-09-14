@@ -74,7 +74,7 @@
                 melocore
             </a>
             <span class="mx-1.5">·</span>
-            <span>v1.2.0</span>
+            <span>v1.3.0</span>
         </div>
 
         <div class="mb-5 p-4 bg-red-50 border border-red-300 rounded-lg text-xs text-red-950 leading-relaxed">
@@ -197,6 +197,68 @@
                 </div>
             </div>
 
+            <!-- 窯體尺寸效應：固定顯示 -->
+            <div class="input-group p-3.5 bg-sky-50/70 border border-sky-200 rounded-lg">
+                <div class="flex items-center justify-between gap-2 mb-2">
+                    <label class="input-label font-bold text-sky-950 mb-0">📐 窯體尺寸效應</label>
+                    <span id="kiln-size-badge" class="text-[11px] font-bold px-2 py-1 rounded-full bg-sky-100 text-sky-800">—</span>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                    <div class="bg-white border border-sky-100 rounded p-2">
+                        <span class="block text-[10px] text-gray-500">目前容量</span>
+                        <strong class="text-sky-950"><span id="size-volume-display">0.0</span> L</strong>
+                    </div>
+                    <div class="bg-white border border-sky-100 rounded p-2">
+                        <span class="block text-[10px] text-gray-500">量產窯參考</span>
+                        <strong class="text-sky-950"><span id="size-ref-wpl">0</span> W/L</strong>
+                    </div>
+                    <div class="bg-white border border-sky-100 rounded p-2">
+                        <span class="block text-[10px] text-gray-500">參考總功率</span>
+                        <strong class="text-sky-950"><span id="size-ref-power">0</span> W</strong>
+                    </div>
+                    <div class="bg-white border border-sky-100 rounded p-2">
+                        <span class="block text-[10px] text-gray-500">目前算法結果</span>
+                        <strong id="current-wpl-display" class="text-sky-950">— W/L</strong>
+                    </div>
+                </div>
+
+                <div class="mt-2.5">
+                    <div class="h-2 rounded-full bg-gradient-to-r from-orange-300 via-sky-300 to-indigo-300 relative overflow-visible">
+                        <span id="kiln-size-marker" class="absolute -top-1.5 w-1.5 h-5 bg-gray-900 rounded transition-all" style="left:0%"></span>
+                    </div>
+                    <div class="flex justify-between text-[9px] text-gray-500 mt-1">
+                        <span>小型<br>W/L 高</span>
+                        <span class="text-center">中型</span>
+                        <span class="text-right">大型／工業<br>W/L 低</span>
+                    </div>
+                </div>
+
+                <p id="size-effect-note" class="mt-2 text-[11px] leading-relaxed text-sky-900">
+                    小窯的表面積／體積比高，通常每公升需要較高功率；窯越大，每公升所需瓦數通常會下降。
+                </p>
+
+                <details class="mt-2 text-[10px] text-gray-600">
+                    <summary class="cursor-pointer text-sky-700 hover:underline">參考曲線怎麼來的？</summary>
+                    <div class="mt-1.5 leading-relaxed">
+                        這裡的量產窯參考曲線，是以 Skutt 與 Olympic 公開的高溫電窯容量／額定功率資料做 log-log 近似，
+                        約為 <strong>P ≈ 336 × V<sup>0.645</sup></strong>（P=W、V=L）。
+                        它只用來把「尺寸效應」顯示給使用者，不取代保溫、最高溫、形狀、裝窯量與升溫要求的工程判斷。
+                        <div class="mt-1">
+                            <a href="https://skutt.com/products-page/ceramic-kilns/km-614/" target="_blank" rel="noopener noreferrer" class="underline">Skutt KM-614</a>
+                            ·
+                            <a href="https://skutt.com/products-page/ceramic-kilns/km-818/" target="_blank" rel="noopener noreferrer" class="underline">KM-818</a>
+                            ·
+                            <a href="https://skutt.com/products-page/ceramic-kilns/km-1027/" target="_blank" rel="noopener noreferrer" class="underline">KM-1027</a>
+                            ·
+                            <a href="https://skutt.com/products-page/ceramic-kilns/km-1227/" target="_blank" rel="noopener noreferrer" class="underline">KM-1227</a>
+                            ·
+                            <a href="https://www.olympickilns.com/product/fl24e/" target="_blank" rel="noopener noreferrer" class="underline">Olympic FL24E</a>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
             <!-- 🔥 燒成溫度設定與耐火材料推薦卡片 -->
             <div class="input-group p-3.5 bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-lg shadow-sm">
                 <label class="input-label font-bold text-orange-950 flex items-center justify-between border-b border-orange-200 pb-1.5 mb-2">
@@ -274,7 +336,7 @@
                     </label>
                     <label class="flex items-center cursor-pointer hover:text-amber-800">
                         <input type="radio" name="power_eval_mode" value="volume" class="mr-1.5 cursor-pointer">
-                        <span><strong>容量與壁厚估算法</strong>：以公升數 + 牆體修正</span>
+                        <span><strong>容量與壁厚估算法</strong>：以容量級距 W/L + 牆體修正</span>
                     </label>
                     <label class="flex items-center cursor-pointer hover:text-amber-800">
                         <input type="radio" name="power_eval_mode" value="custom" class="mr-1.5 cursor-pointer">
@@ -596,6 +658,15 @@
             const calcVolDisplay = document.getElementById('calc_vol_display');
             const calcAreaDisplay = document.getElementById('calc_area_display');
 
+            // 窯體尺寸效應 DOM
+            const kilnSizeBadge = document.getElementById('kiln-size-badge');
+            const sizeVolumeDisplay = document.getElementById('size-volume-display');
+            const sizeRefWpl = document.getElementById('size-ref-wpl');
+            const sizeRefPower = document.getElementById('size-ref-power');
+            const currentWplDisplay = document.getElementById('current-wpl-display');
+            const kilnSizeMarker = document.getElementById('kiln-size-marker');
+            const sizeEffectNote = document.getElementById('size-effect-note');
+
             // 尺寸 DOM
             const boxL = document.getElementById('box_length');
             const boxW = document.getElementById('box_width');
@@ -821,6 +892,71 @@
                 el.innerHTML = htmlText;
             }
 
+            function classifyKilnSize(V) {
+                if (V < 40) return { label: '小型窯', note: '小型窯表面積／體積比最高，每公升通常需要較高瓦數。' };
+                if (V < 120) return { label: '中小型窯', note: '容量增加後，單位公升的散熱負擔開始下降。' };
+                if (V < 300) return { label: '中型窯', note: '中型窯的 W/L 通常已明顯低於桌上型／小型窯。' };
+                if (V < 700) return { label: '大型窯', note: '大型窯靠尺度效應降低每公升所需功率，但總功率仍很高。' };
+                return { label: '工業／超大型窯', note: '超大型窯的 W/L 可更低，但配電、分區控制與熱均勻性會成為主要設計問題。' };
+            }
+
+            function commercialSizeReference(V) {
+                // Empirical display-only curve fitted from published high-temperature electric kiln specs:
+                // Skutt KM-614 / KM-818 / KM-1027 / KM-1227 and Olympic FL8E/12E/17E/20E/24E/64E.
+                // P ≈ 335.67 * V^0.64485, rounded here for readability.
+                const power = 336 * Math.pow(V, 0.645);
+                return {
+                    power,
+                    wpl: power / V
+                };
+            }
+
+            function updateSizeEffectCard(V, calculatedPower = null) {
+                if (!(V > 0)) {
+                    if (sizeVolumeDisplay) sizeVolumeDisplay.textContent = '0.0';
+                    if (sizeRefWpl) sizeRefWpl.textContent = '0';
+                    if (sizeRefPower) sizeRefPower.textContent = '0';
+                    if (currentWplDisplay) currentWplDisplay.textContent = '— W/L';
+                    if (kilnSizeBadge) kilnSizeBadge.textContent = '—';
+                    if (kilnSizeMarker) kilnSizeMarker.style.left = '0%';
+                    return;
+                }
+
+                const ref = commercialSizeReference(V);
+                const size = classifyKilnSize(V);
+
+                if (sizeVolumeDisplay) sizeVolumeDisplay.textContent = V.toFixed(1);
+                if (sizeRefWpl) sizeRefWpl.textContent = ref.wpl.toFixed(0);
+                if (sizeRefPower) sizeRefPower.textContent = Math.round(ref.power);
+                if (kilnSizeBadge) kilnSizeBadge.textContent = size.label;
+
+                if (calculatedPower && calculatedPower > 0) {
+                    const currentWpl = calculatedPower / V;
+                    const ratio = currentWpl / ref.wpl;
+                    let compareText = '';
+                    if (ratio > 1.25) compareText = '（高於量產窯參考）';
+                    else if (ratio < 0.75) compareText = '（低於量產窯參考）';
+                    else compareText = '（接近量產窯參考）';
+                    if (currentWplDisplay) currentWplDisplay.textContent = `${currentWpl.toFixed(0)} W/L ${compareText}`;
+                } else {
+                    if (currentWplDisplay) currentWplDisplay.textContent = '— W/L';
+                }
+
+                // Log scale from 10 L to 1800 L so very large kilns remain visible.
+                const minL = 10;
+                const maxL = 1800;
+                const clamped = Math.min(maxL, Math.max(minL, V));
+                const pos = (Math.log(clamped / minL) / Math.log(maxL / minL)) * 100;
+                if (kilnSizeMarker) kilnSizeMarker.style.left = `calc(${pos.toFixed(1)}% - 3px)`;
+
+                if (sizeEffectNote) {
+                    sizeEffectNote.innerHTML =
+                        `<strong>${size.label}：</strong>${size.note} ` +
+                        `目前量產窯尺寸參考約 <strong>${ref.wpl.toFixed(0)} W/L</strong>。` +
+                        `這是容量尺度的參考，不是你的窯一定要做成這個瓦數。`;
+                }
+            }
+
             function clearResults() {
                 if (resPower) resPower.textContent = "0";
                 if (resCurrent) resCurrent.textContent = "0.00";
@@ -840,6 +976,7 @@
                 if (resMinDiameter) resMinDiameter.textContent = "0.0";
                 if (resRecLength) resRecLength.textContent = "0.00";
                 if (surfaceStatusText) surfaceStatusText.textContent = "";
+                if (currentWplDisplay) currentWplDisplay.textContent = "— W/L";
                 if (surfaceStatusBox) surfaceStatusBox.className = "mt-4 p-3 rounded-lg border text-sm bg-slate-50 border-slate-200";
                 setStatusBox(currentWarningBox, 'info', '請輸入有效參數後查看供電電流警告。');
                 setStatusBox(geometryWarningBox, 'info', '請輸入有效參數後查看線圈幾何與材料提示。');
@@ -897,6 +1034,9 @@
                     calcAreaDisplay.textContent = innerSurfaceArea > 0 ? Math.round(innerSurfaceArea) : "0";
                 }
 
+                // 尺寸效應卡永遠先更新，即使後面的電氣參數尚未完整。
+                updateSizeEffectCard(V);
+
                 const U = parseFloat(voltageInput ? voltageInput.value : 0);
                 const D = parseFloat(diameterInput ? diameterInput.value : 0);
                 const D_rod = parseFloat(rodDiameterInput ? rodDiameterInput.value : 0);
@@ -943,17 +1083,27 @@
                     }
                 } else if (powerEvalMode === 'volume') {
                     let baseWPerL = 85;
-                    if (V <= 10) baseWPerL = 120;
-                    else if (V <= 50) baseWPerL = 85;
-                    else if (V <= 200) baseWPerL = 60;
-                    else baseWPerL = 40;
+                    let sizeBandText = '10–50 L';
+                    if (V <= 10) {
+                        baseWPerL = 120;
+                        sizeBandText = '≤10 L';
+                    } else if (V <= 50) {
+                        baseWPerL = 85;
+                        sizeBandText = '10–50 L';
+                    } else if (V <= 200) {
+                        baseWPerL = 60;
+                        sizeBandText = '50–200 L';
+                    } else {
+                        baseWPerL = 40;
+                        sizeBandText = '>200 L';
+                    }
 
                     const hotFactor = parseFloat(hotBrickSelect ? hotBrickSelect.value : 1.0) || 1.0;
                     const backupFactor = parseFloat(backupInsulSelect ? backupInsulSelect.value : 0.95) || 0.95;
                     P = V * baseWPerL * hotFactor * backupFactor * powerMultiplier;
 
                     if (powerAdvice) {
-                        powerAdvice.textContent = `*容量法：${V.toFixed(1)} L × ${baseWPerL} W/L × 材料修正（功率設計倍率 ${powerMultiplier}x）`;
+                        powerAdvice.textContent = `*容量法：${V.toFixed(1)} L 屬 ${sizeBandText} 級距，基準 ${baseWPerL} W/L × 材料修正（功率設計倍率 ${powerMultiplier}x）`;
                     }
                 } else {
                     const customP = parseFloat(customPowerInput ? customPowerInput.value : 2500) || 2500;
@@ -967,6 +1117,9 @@
                     clearResults();
                     return;
                 }
+
+                // 顯示「目前算法」與容量尺度參考的差異，避免尺寸效應藏在公式裡。
+                updateSizeEffectCard(V, P);
 
                 // Supply / branch electrical values.
                 const I_total = P / U;
