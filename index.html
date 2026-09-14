@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>窯爐加熱器計算器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .input-group {
+            margin-bottom: 1rem;
+        }
+        .input-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+        }
+        .input-field {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+        }
+        .result-box {
+            background-color: #ffffff;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-top: 1.5rem;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 0.5rem;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #4b5563;
+        }
+        .result-value {
+            font-weight: 600;
+            color: #111827;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-xl">
+        <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">窯爐加熱器與電熱絲計算器</h1>
+
+        <div class="space-y-4">
+            <!-- 窯爐容量輸入與幾何換算 -->
+            <div class="input-group">
+                <label class="input-label">窯爐容量與尺寸規格 (幾何換算)</label>
+                
+                <!-- 容量模式選擇 -->
+                <div class="flex flex-wrap gap-2 mb-3 text-xs text-gray-700">
+                    <label class="flex items-center cursor-pointer hover:text-blue-600">
+                        <input type="radio" name="vol_mode" value="direct" class="mr-1 cursor-pointer" checked> 直接輸入公升
+                    </label>
+                    <label class="flex items-center cursor-pointer hover:text-blue-600">
+                        <input type="radio" name="vol_mode" value="box" class="mr-1 cursor-pointer"> 四方體
+                    </label>
+                    <label class="flex items-center cursor-pointer hover:text-blue-600">
+                        <input type="radio" name="vol_mode" value="cylinder" class="mr-1 cursor-pointer"> 圓形
+                    </label>
+                    <label class="flex items-center cursor-pointer hover:text-blue-600">
+                        <input type="radio" name="vol_mode" value="octagon" class="mr-1 cursor-pointer"> 八角形
+                    </label>
+                    <label class="flex items-center cursor-pointer hover:text-blue-600">
+                        <input type="radio" name="vol_mode" value="decagon" class="mr-1 cursor-pointer"> 十角形
+                    </label>
+                </div>
+
+                <!-- 模式 0: 直接輸入公升數 -->
+                <div id="vol_direct_div">
+                    <input type="number" id="volume" class="input-field" placeholder="例如: 30" min="1" step="1" value="30">
+                </div>
+
+                <!-- 模式 1: 四方立方體 (長寬高) -->
+                <div id="vol_box_div" class="hidden p-3 bg-gray-50 border border-gray-200 rounded-md">
+                    <p class="text-xs text-gray-500 mb-2">請輸入內膽內部尺寸 (單位: 公分 cm)：</p>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="text-xs text-gray-600 block mb-1">長 (cm)</label>
+                            <input type="number" id="box_length" class="input-field px-2 py-1 text-sm" value="30" step="0.5" min="1">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-600 block mb-1">寬 (cm)</label>
+                            <input type="number" id="box_width" class="input-field px-2 py-1 text-sm" value="30" step="0.5" min="1">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-600 block mb-1">高 (cm)</label>
+                            <input type="number" id="box_height" class="input-field px-2 py-1 text-sm" value="35" step="0.5" min="1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 模式 2: 圓形 (半徑與深度) -->
+                <div id="vol_cylinder_div" class="hidden p-3 bg-gray-50 border border-gray-200 rounded-md">
+                    <p class="text-xs text-gray-500 mb-2">請輸入圓形內膽尺寸 (單位: 公分 cm)：</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-xs text-gray-600 block mb-1">內半徑 R (cm)</label>
+                            <input type="number" id="cyl_radius" class="input-field px-2 py-1 text-sm" value="18" step="0.5" min="1">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-600 block mb-1">深度/高 H (cm)</label>
+                            <input type="number" id="cyl_height" class="input-field px-2 py-1 text-sm" value="30" step="0.5" min="1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 模式 3: 八角形 (單邊長與深度) -->
+                <div id="vol_octagon_div" class="hidden p-3 bg-gray-50 border border-gray-200 rounded-md">
+                    <p class="text-xs text-gray-500 mb-2">請輸入正八角形內膽尺寸 (單位: 公分 cm)：</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-xs text-gray-600 block mb-1">單邊長 a (cm)</label>
+                            <input type="number" id="oct_side" class="input-field px-2 py-1 text-sm" value="14" step="0.5" min="1">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-600 block mb-1">深度 H (cm)</label>
+                            <input type="number" id="oct_height" class="input-field px-2 py-1 text-sm" value="30" step="0.5" min="1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 模式 4: 十角形 (單邊長與深度) -->
+                <div id="vol_decagon_div" class="hidden p-3 bg-gray-50 border border-gray-200 rounded-md">
+                    <p class="text-xs text-gray-500 mb-2">請輸入正十角形內膽尺寸 (單位: 公分 cm)：</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-xs text-gray-600 block mb-1">單邊長 a (cm)</label>
+                            <input type="number" id="dec_side" class="input-field px-2 py-1 text-sm" value="12" step="0.5" min="1">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-600 block mb-1">深度 H (cm)</label>
+                            <input type="number" id="dec_height" class="input-field px-2 py-1 text-sm" value="30" step="0.5" min="1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 形狀換算後的結果顯示 -->
+                <div id="calculated_vol_box" class="hidden text-sm text-indigo-700 font-medium bg-indigo-50 p-2 rounded mt-2 text-center">
+                    換算窯爐容量：<span id="calc_vol_display">0.0</span> 公升 (L)
+                    <span class="text-xs text-gray-500 block mt-0.5">內表面積：<span id="calc_area_display">0</span> cm²</span>
+                </div>
+            </div>
+
+            <!-- 🔥 燒成溫度設定與耐火材料推薦卡片 -->
+            <div class="input-group p-3.5 bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-lg shadow-sm">
+                <label class="input-label font-bold text-orange-950 flex items-center justify-between border-b border-orange-200 pb-1.5 mb-2">
+                    <span class="flex items-center text-sm">
+                        <svg class="w-4 h-4 mr-1 text-orange-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.716 1.114-1.68 2.675-2.85 4.414-1.07 1.587-2.185 3.12-3.11 4.397a13.33 13.33 0 00-.738 1.096A6.992 6.992 0 002.5 17c0 3.866 3.582 7 8 7s8-3.134 8-7c0-2.274-1.229-4.303-3.107-5.568a9.4 9.4 0 00-.992-1.393c-.926-1.127-2.04-2.66-3.006-4.486zm-1.897 4.542c.8-1.218 1.48-2.31 1.956-3.177.68 1.29 1.503 2.523 2.275 3.463.784.954 1.766 2.378 1.766 3.62a4.99 4.99 0 01-5 5 4.99 4.99 0 01-5-5c0-.756.402-1.57 1.003-2.392.795-1.092 1.76-2.42 2.000-2.514z" clip-rule="evenodd"/></svg>
+                        目標燒成溫度與材料推薦
+                    </span>
+                    <span class="text-[11px] font-normal text-orange-700 bg-orange-100/80 px-2 py-0.5 rounded-full">專家推薦選材</span>
+                </label>
+
+                <!-- 溫度選擇下拉與客製輸入 -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+                    <div>
+                        <label class="text-xs text-gray-700 font-medium block mb-1">預設燒製用途：</label>
+                        <select id="target_temp_preset" class="input-field text-xs py-1.5 bg-white">
+                            <option value="800">800°C (烤花 / 熔玻璃 / 烤漆)</option>
+                            <option value="1000">1000°C (陶藝素燒 Cone 06)</option>
+                            <option value="1220" selected>1220°C (中溫釉燒 Cone 6 標準)</option>
+                            <option value="1300">1300°C (高溫瓷器 Cone 10)</option>
+                            <option value="custom">自訂溫度 (°C)</option>
+                        </select>
+                    </div>
+                    <div id="custom_temp_div" class="hidden">
+                        <label class="text-xs text-gray-700 font-medium block mb-1">目標最高溫 (°C)：</label>
+                        <input type="number" id="target_temp_input" class="input-field px-2 py-1 text-xs text-right bg-white" value="1220" min="100" max="1400" step="10">
+                    </div>
+                </div>
+
+                <!-- 動態建議展示卡片 -->
+                <div id="material_recommendation_card" class="bg-white/90 p-3 rounded border border-orange-200 text-xs space-y-2">
+                    <div class="flex items-center justify-between font-bold text-gray-800 border-b border-gray-100 pb-1">
+                        <span>🧱 搭配方案建議：</span>
+                        <span id="rec_temp_tag" class="text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded text-[11px]">1220°C Cone 6</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-gray-700">
+                        <div class="bg-gray-50 p-2 rounded">
+                            <span class="text-gray-500 block text-[10px]">1. 熱面斷熱磚 (Hot-Face)</span>
+                            <strong id="rec_brick_text" class="text-amber-900 block mt-0.5">K-23 輕質斷熱磚</strong>
+                            <span id="rec_brick_desc" class="text-[10px] text-gray-500 block">耐溫 1260°C，導熱低且省電</span>
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded">
+                            <span class="text-gray-500 block text-[10px]">2. 外層背襯絕熱 (Backup)</span>
+                            <strong id="rec_backup_text" class="text-amber-900 block mt-0.5">25mm 陶瓷纖維毯</strong>
+                            <span id="rec_backup_desc" class="text-[10px] text-gray-500 block">阻絕外散熱，外殼保溫安全</span>
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded">
+                            <span class="text-gray-500 block text-[10px]">3. 建議加熱線 (Wire)</span>
+                            <strong id="rec_wire_text" class="text-blue-900 block mt-0.5">康泰爾 Kanthal A1</strong>
+                            <span id="rec_wire_desc" class="text-[10px] text-gray-500 block">耐高溫抗氧化 (ρ=1.4)</span>
+                        </div>
+                    </div>
+
+                    <button type="button" id="apply_rec_btn" class="w-full mt-2 py-1.5 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded text-xs transition flex items-center justify-center space-x-1 shadow-sm">
+                        <span>✨ 一鍵套用此建議設定至下方計算器</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 功率評估設定區塊 -->
+            <div class="input-group p-3 bg-amber-50/60 border border-amber-200 rounded-lg">
+                <label class="input-label font-bold text-amber-900 flex items-center justify-between">
+                    <span>⚡ 功率 (W) 評估模式</span>
+                    <button type="button" id="toggle-guide-btn" class="text-xs text-blue-600 hover:underline font-normal flex items-center">
+                        <svg class="w-3.5 h-3.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        熱學原理觀念說明
+                    </button>
+                </label>
+
+                <!-- 評估模式選單 -->
+                <div class="space-y-1.5 mb-3 text-xs text-gray-800">
+                    <label class="flex items-center cursor-pointer hover:text-amber-800">
+                        <input type="radio" name="power_eval_mode" value="olsen" class="mr-1.5 cursor-pointer" checked>
+                        <span><strong>歐森表面積法則 (推薦)</strong>：以內表面積評估</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer hover:text-amber-800">
+                        <input type="radio" name="power_eval_mode" value="volume" class="mr-1.5 cursor-pointer">
+                        <span><strong>容量與壁厚估算法</strong>：以公升數 + 牆體修正</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer hover:text-amber-800">
+                        <input type="radio" name="power_eval_mode" value="custom" class="mr-1.5 cursor-pointer">
+                        <span><strong>直接指定功率</strong>：手動填寫總瓦數 (W)</span>
+                    </label>
+                </div>
+
+                <!-- 模式 A: 歐森表面積法則參數 -->
+                <div id="eval_olsen_div" class="text-xs space-y-2 bg-white p-2.5 rounded border border-amber-100 mb-2">
+                    <div class="flex justify-between items-center">
+                        <label class="text-gray-700 font-medium">表面功率密度 (W/cm²):</label>
+                        <input type="number" id="olsen_density" class="input-field px-2 py-1 text-xs w-28 text-right" value="0.85" step="0.05" min="0.5" max="2.0">
+                    </div>
+                    <div class="text-[11px] text-gray-500">
+                        💡 標準評估值 0.85 W/cm²（一般電窯範圍 0.78 ~ 1.09 W/cm²）
+                    </div>
+                </div>
+
+                <!-- 模式 B: 壁厚修正參數 -->
+                <div id="eval_volume_div" class="hidden text-xs space-y-2.5 bg-white p-2.5 rounded border border-amber-100">
+                    <div>
+                        <label class="text-gray-700 font-medium block mb-1">1. 熱面磚材 (Hot-Face Material)：</label>
+                        <select id="hot_brick_select" class="input-field text-xs py-1 mb-2">
+                            <option value="1.0" selected>K-23 輕質斷熱磚 (耐溫 1260°C / 標準中溫 Cone 6)</option>
+                            <option value="1.08">K-26 輕質斷熱磚 (耐溫 1430°C / 高溫瓷器 Cone 10)</option>
+                            <option value="0.85">陶瓷纖維板/毯 (低蓄熱 / 極速升溫型)</option>
+                        </select>
+
+                        <label class="text-gray-700 font-medium block mb-1">2. 外層背襯絕熱 (Backup Insulation)：</label>
+                        <select id="backup_insul_select" class="input-field text-xs py-1">
+                            <option value="1.18">無背襯 (僅單層磚/板 6.5~7.5 cm) ［熱損較高］</option>
+                            <option value="0.95" selected>加裝 25mm 陶瓷纖維毯/板 ［商用電窯標準省電配置］</option>
+                            <option value="0.82">加裝 50mm 雙層複合絕熱 ［超低散熱 / 省電優選］</option>
+                        </select>
+                    </div>
+                    <div class="text-[11px] text-amber-800 bg-amber-50 p-1.5 rounded border border-amber-200">
+                        💡 <strong>小知識：</strong> K-26 磚耐溫較高，但密度稍大，導熱率比 K-23 高約 8%，故搭配背襯纖維毯可大幅補償散熱。
+                    </div>
+                </div>
+
+                <!-- 模式 C: 手動指定瓦數 -->
+                <div id="eval_custom_div" class="hidden text-xs space-y-2 bg-white p-2.5 rounded border border-amber-100">
+                    <div class="flex justify-between items-center">
+                        <label class="text-gray-700 font-medium">指定總功率 (W):</label>
+                        <input type="number" id="custom_power_input" class="input-field px-2 py-1 text-xs w-28 text-right" value="2500" step="100" min="100">
+                    </div>
+                </div>
+
+                <!-- 通用參數：安全餘裕/升溫速率係數 -->
+                <div class="mt-2.5 pt-2 border-t border-amber-200/60 flex items-center justify-between text-xs">
+                    <label class="text-gray-700 font-medium flex items-center" title="預留電熱絲老化降功率與升溫速率餘裕">
+                        安全餘裕 / 升溫倍率:
+                    </label>
+                    <select id="safety_margin_select" class="input-field text-xs py-0.5 px-1.5 w-28 text-right">
+                        <option value="1.0">1.0x (無餘裕)</option>
+                        <option value="1.15" selected>1.15x (標準推薦)</option>
+                        <option value="1.3">1.30x (快燒/高餘裕)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 熱學觀念說明展開盒 -->
+            <div id="thermal-guide-box" class="hidden p-3.5 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-900 space-y-2 leading-relaxed">
+                <h3 class="font-bold text-sm text-blue-950 flex items-center justify-between border-b border-blue-200 pb-1">
+                    <span>💡 為什麼容量小/壁厚薄需要更高瓦數？</span>
+                    <button type="button" id="close-guide-btn" class="text-blue-500 hover:text-blue-800 text-base font-bold">&times;</button>
+                </h3>
+                <p><strong>1. 幾何學（S/V 表面積與體積比）：</strong><br>
+                窯爐「儲熱」與體積成正比，但「散熱」卻是透過外表面進行。小窯爐的表面積佔體積比例遠高於大窯爐（例如 10L 小窯的每公升散熱面積是大窯的數倍），因此每公升需要配置更高瓦數以補償散熱。</p>
+                
+                <p><strong>2. 傅立葉熱傳導（壁厚）：</strong><br>
+                散熱量與壁厚成反比。若使用薄型陶瓷纖維壁（如 3-5 cm），在 1200°C 高溫時熱散失極快，必須提升 20%~30% 瓦數才能順利攻頂升溫。</p>
+
+                <p><strong>3. 歐森表面積法則（Fred Olsen Rule）：</strong><br>
+                陶藝工程中最準確的估算法。改用「內表面積（cm²）」來乘以固定功率密度（如 0.85 W/cm²），能自動調和形狀狹長或微型窯爐的功率需求！</p>
+            </div>
+
+            <!-- 電壓輸入 -->
+            <div class="input-group">
+                <label class="input-label" for="voltage">電壓 U (V)</label>
+                <input type="number" id="voltage" class="input-field" placeholder="例如: 220" min="1" step="1" value="220">
+            </div>
+
+            <!-- 線徑輸入 -->
+            <div class="input-group">
+                <label class="input-label" for="diameter">導線直徑 D (mm)</label>
+                <input type="number" id="diameter" class="input-field" placeholder="例如: 1.0" min="0.1" step="0.1" value="1.0">
+            </div>
+
+            <!-- 電阻率設定 (三種模式) -->
+            <div class="input-group">
+                <label class="input-label">導線電阻率 ρ (Ω·mm²/m)</label>
+                
+                <!-- 模式切換按鈕 -->
+                <div class="flex items-center space-x-4 mb-3 text-sm text-gray-700">
+                    <label class="flex items-center cursor-pointer hover:text-blue-600">
+                        <input type="radio" name="rho_mode" value="preset" class="mr-1.5 cursor-pointer" checked> 預設
+                    </label>
+                    <label class="flex items-center cursor-pointer hover:text-blue-600">
+                        <input type="radio" name="rho_mode" value="custom" class="mr-1.5 cursor-pointer"> 手動
+                    </label>
+                    <label class="flex items-center cursor-pointer hover:text-blue-600">
+                        <input type="radio" name="rho_mode" value="measure" class="mr-1.5 cursor-pointer"> 實測換算
+                    </label>
+                </div>
+
+                <!-- 模式 1: 預設材質 -->
+                <div id="rho_preset_div">
+                    <select id="material" class="input-field">
+                        <option value="1.4">康泰爾 (Kanthal) - ρ=1.4</option>
+                        <option value="1.1">鎳鉻合金 (Nichrome) - ρ=1.1</option>
+                    </select>
+                </div>
+
+                <!-- 模式 2: 手動輸入 -->
+                <div id="rho_custom_div" class="hidden">
+                    <input type="number" id="custom_rho" class="input-field" placeholder="例如: 1.2" min="0.1" step="0.01" value="1.4">
+                </div>
+
+                <!-- 模式 3: 實測換算 -->
+                <div id="rho_measure_div" class="hidden p-3 bg-gray-50 border border-gray-200 rounded-md">
+                    <p class="text-xs text-gray-500 mb-2">請先確認上方「導線直徑」正確，並輸入實測數據：</p>
+                    <div class="flex space-x-2 mb-2">
+                        <div class="w-1/2">
+                            <label class="text-xs text-gray-600 block mb-1">測試線長 (m)</label>
+                            <input type="number" id="measure_L" class="input-field px-2 py-1.5 text-sm" value="1" step="0.1" min="0.1">
+                        </div>
+                        <div class="w-1/2">
+                            <label class="text-xs text-gray-600 block mb-1">實測阻值 (Ω)</label>
+                            <input type="number" id="measure_R" class="input-field px-2 py-1.5 text-sm" value="1.78" step="0.1" min="0.1">
+                        </div>
+                    </div>
+                    <div class="text-sm text-blue-700 font-medium bg-blue-50 p-1.5 rounded text-center">
+                        換算電阻率 ρ = <span id="calc_rho_display">1.40</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 捲繞圓棒直徑輸入 -->
+            <div class="input-group">
+                <label class="input-label" for="rod-diameter">捲繞圓棒 (心軸) 直徑 (mm)</label>
+                <input type="number" id="rod-diameter" class="input-field" placeholder="例如: 6.0" min="1" step="0.5" value="6.0">
+            </div>
+        </div>
+
+        <!-- 建議功率倍率顯示 -->
+        <p id="power-advice" class="text-sm text-gray-500 mt-2 italic"></p>
+
+        <!-- 計算結果顯示區域 -->
+        <div class="result-box">
+            <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">計算結果</h2>
+            
+            <div class="result-item">
+                <span class="result-label">估算總功率 (P):</span>
+                <span class="result-value"><span id="res-power">0</span> W</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">電流 (I):</span>
+                <span class="result-value"><span id="res-current">0.00</span> A</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">總電阻 (R):</span>
+                <span class="result-value"><span id="res-resistance">0.00</span> Ω</span>
+            </div>
+
+            <div class="result-item">
+                <span class="result-label">導線截面積 (S):</span>
+                <span class="result-value"><span id="res-area">0.00</span> mm²</span>
+            </div>
+
+            <div class="result-item text-blue-600 bg-blue-50 p-2 rounded -mx-2 mt-2">
+                <span class="result-label font-bold">所需導線總長度 (L):</span>
+                <span class="result-value font-bold text-lg"><span id="res-length">0.00</span> m</span>
+            </div>
+
+            <!-- 圈數與密繞長度顯示 -->
+            <div class="result-item text-green-700 bg-green-50 p-2 rounded -mx-2 mt-2">
+                <span class="result-label font-bold">線圈圈數 (N):</span>
+                <span class="result-value font-bold text-lg"><span id="res-turns">0</span> 圈</span>
+            </div>
+            
+            <div class="result-item text-green-700 bg-green-50 p-2 rounded -mx-2 mt-2">
+                <span class="result-label font-bold">剛繞好的密繞總長度:</span>
+                <span class="result-value font-bold text-lg"><span id="res-coil-length">0.0</span> cm</span>
+            </div>
+        </div>
+        
+        <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+            <strong>注意：</strong> 算出的「密繞長度」是剛繞好、圈圈緊貼時的長度。實際安裝到窯爐時，通常需要將線圈拉開（拉長約 2~3 倍），以避免散熱不良導致燒斷。若要製作兩個電路，請將總圈數平分。
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM 元素引用
+            const volumeInput = document.getElementById('volume');
+            const volRadios = document.querySelectorAll('input[name="vol_mode"]');
+            const volDirectDiv = document.getElementById('vol_direct_div');
+            const volBoxDiv = document.getElementById('vol_box_div');
+            const volCylinderDiv = document.getElementById('vol_cylinder_div');
+            const volOctagonDiv = document.getElementById('vol_octagon_div');
+            const volDecagonDiv = document.getElementById('vol_decagon_div');
+            const calculatedVolBox = document.getElementById('calculated_vol_box');
+            const calcVolDisplay = document.getElementById('calc_vol_display');
+            const calcAreaDisplay = document.getElementById('calc_area_display');
+
+            // 尺寸 DOM
+            const boxL = document.getElementById('box_length');
+            const boxW = document.getElementById('box_width');
+            const boxH = document.getElementById('box_height');
+            const cylR = document.getElementById('cyl_radius');
+            const cylH = document.getElementById('cyl_height');
+            const octS = document.getElementById('oct_side');
+            const octH = document.getElementById('oct_height');
+            const decS = document.getElementById('dec_side');
+            const decH = document.getElementById('dec_height');
+
+            // 推薦卡片 DOM
+            const targetTempPreset = document.getElementById('target_temp_preset');
+            const targetTempInput = document.getElementById('target_temp_input');
+            const customTempDiv = document.getElementById('custom_temp_div');
+            const recTempTag = document.getElementById('rec_temp_tag');
+            const recBrickText = document.getElementById('rec_brick_text');
+            const recBrickDesc = document.getElementById('rec_brick_desc');
+            const recBackupText = document.getElementById('rec_backup_text');
+            const recBackupDesc = document.getElementById('rec_backup_desc');
+            const recWireText = document.getElementById('rec_wire_text');
+            const recWireDesc = document.getElementById('rec_wire_desc');
+            const applyRecBtn = document.getElementById('apply_rec_btn');
+
+            // 功率評估 DOM
+            const powerEvalRadios = document.querySelectorAll('input[name="power_eval_mode"]');
+            const evalOlsenDiv = document.getElementById('eval_olsen_div');
+            const evalVolumeDiv = document.getElementById('eval_volume_div');
+            const evalCustomDiv = document.getElementById('eval_custom_div');
+            const olsenDensityInput = document.getElementById('olsen_density');
+            const hotBrickSelect = document.getElementById('hot_brick_select');
+            const backupInsulSelect = document.getElementById('backup_insul_select');
+            const customPowerInput = document.getElementById('custom_power_input');
+            const safetyMarginSelect = document.getElementById('safety_margin_select');
+
+            // 說明 Toggle DOM
+            const toggleGuideBtn = document.getElementById('toggle-guide-btn');
+            const closeGuideBtn = document.getElementById('close-guide-btn');
+            const thermalGuideBox = document.getElementById('thermal-guide-box');
+
+            // 電氣與導線 DOM
+            const voltageInput = document.getElementById('voltage');
+            const diameterInput = document.getElementById('diameter');
+            const rodDiameterInput = document.getElementById('rod-diameter');
+            const powerAdvice = document.getElementById('power-advice');
+
+            // 電阻率 DOM
+            const materialSelect = document.getElementById('material');
+            const rhoRadios = document.querySelectorAll('input[name="rho_mode"]');
+            const rhoPresetDiv = document.getElementById('rho_preset_div');
+            const rhoCustomDiv = document.getElementById('rho_custom_div');
+            const rhoMeasureDiv = document.getElementById('rho_measure_div');
+            const customRhoInput = document.getElementById('custom_rho');
+            const measureLInput = document.getElementById('measure_L');
+            const measureRInput = document.getElementById('measure_R');
+            const calcRhoDisplay = document.getElementById('calc_rho_display');
+
+            // 結果顯示 DOM
+            const resPower = document.getElementById('res-power');
+            const resCurrent = document.getElementById('res-current');
+            const resResistance = document.getElementById('res-resistance');
+            const resArea = document.getElementById('res-area');
+            const resLength = document.getElementById('res-length');
+            const resTurns = document.getElementById('res-turns');
+            const resCoilLength = document.getElementById('res-coil-length');
+
+            // 當前推薦參數快照
+            let currentRec = {
+                hotBrickValue: "1.0",
+                backupInsulValue: "0.95",
+                wireMaterialValue: "1.4"
+            };
+
+            function updateVolUI() {
+                const volMode = document.querySelector('input[name="vol_mode"]:checked')?.value || 'direct';
+                
+                volDirectDiv?.classList.toggle('hidden', volMode !== 'direct');
+                volBoxDiv?.classList.toggle('hidden', volMode !== 'box');
+                volCylinderDiv?.classList.toggle('hidden', volMode !== 'cylinder');
+                volOctagonDiv?.classList.toggle('hidden', volMode !== 'octagon');
+                volDecagonDiv?.classList.toggle('hidden', volMode !== 'decagon');
+                calculatedVolBox?.classList.toggle('hidden', volMode === 'direct');
+                
+                calculate();
+            }
+
+            function updatePowerEvalUI() {
+                const evalMode = document.querySelector('input[name="power_eval_mode"]:checked')?.value || 'olsen';
+                
+                evalOlsenDiv?.classList.toggle('hidden', evalMode !== 'olsen');
+                evalVolumeDiv?.classList.toggle('hidden', evalMode !== 'volume');
+                evalCustomDiv?.classList.toggle('hidden', evalMode !== 'custom');
+
+                calculate();
+            }
+
+            function updateRhoUI() {
+                const rhoMode = document.querySelector('input[name="rho_mode"]:checked')?.value || 'preset';
+
+                rhoPresetDiv?.classList.toggle('hidden', rhoMode !== 'preset');
+                rhoCustomDiv?.classList.toggle('hidden', rhoMode !== 'custom');
+                rhoMeasureDiv?.classList.toggle('hidden', rhoMode !== 'measure');
+
+                calculate();
+            }
+
+            function updateRecommendation() {
+                let temp = 1220;
+                if (targetTempPreset && targetTempPreset.value !== 'custom') {
+                    temp = parseInt(targetTempPreset.value) || 1220;
+                    if (targetTempInput) targetTempInput.value = temp;
+                    customTempDiv?.classList.add('hidden');
+                } else {
+                    customTempDiv?.classList.remove('hidden');
+                    temp = parseInt(targetTempInput ? targetTempInput.value : 1220) || 1220;
+                }
+
+                if (temp <= 900) {
+                    if (recTempTag) recTempTag.textContent = `${temp}°C 低溫/烤花`;
+                    if (recBrickText) recBrickText.textContent = "陶瓷纖維板 或 K-20 斷熱磚";
+                    if (recBrickDesc) recBrickDesc.textContent = "低蓄熱升溫快，適用低溫烤花/玻璃";
+                    if (recBackupText) recBackupText.textContent = "可無背襯 或 25mm 纖維毯";
+                    if (recBackupDesc) recBackupDesc.textContent = "散熱損失較小，單層壁結構即足夠";
+                    if (recWireText) recWireText.textContent = "鎳鉻合金 (Nichrome) 或 Kanthal";
+                    if (recWireDesc) recWireDesc.textContent = "低溫下耐用度佳，成本較便宜";
+
+                    currentRec = {
+                        hotBrickValue: "0.85",
+                        backupInsulValue: "1.18",
+                        wireMaterialValue: "1.1"
+                    };
+                } else if (temp > 900 && temp <= 1250) {
+                    if (recTempTag) recTempTag.textContent = `${temp}°C Cone 6 標準`;
+                    if (recBrickText) recBrickText.textContent = "K-23 輕質斷熱磚";
+                    if (recBrickDesc) recBrickDesc.textContent = "耐溫 1260°C，電窯業界最標準配置";
+                    if (recBackupText) recBackupText.textContent = "加裝 25mm 陶瓷纖維毯";
+                    if (recBackupDesc) recBackupDesc.textContent = "經典背襯，大幅降低外殼溫度與省電";
+                    if (recWireText) recWireText.textContent = "康泰爾 Kanthal A1";
+                    if (recWireDesc) recWireDesc.textContent = "高溫抗氧化極佳，絕佳壽命 (ρ=1.4)";
+
+                    currentRec = {
+                        hotBrickValue: "1.0",
+                        backupInsulValue: "0.95",
+                        wireMaterialValue: "1.4"
+                    };
+                } else {
+                    if (recTempTag) recTempTag.textContent = `${temp}°C Cone 10 高溫瓷器`;
+                    if (recBrickText) recBrickText.textContent = "K-26 高溫輕質斷熱磚";
+                    if (recBrickDesc) recBrickDesc.textContent = "耐溫 1430°C，結構強且高溫耐燒";
+                    if (recBackupText) recBackupText.textContent = "加裝 25mm~50mm 雙層絕熱";
+                    if (recBackupDesc) recBackupDesc.textContent = "1300°C高溫散熱快，強烈建議加厚背襯";
+                    if (recWireText) recWireText.textContent = "必須使用 Kanthal A1 康泰爾";
+                    if (recWireDesc) recWireDesc.textContent = "1300°C 鎳鉻合金會快速熔斷，限用康泰爾";
+
+                    currentRec = {
+                        hotBrickValue: "1.08",
+                        backupInsulValue: "0.82",
+                        wireMaterialValue: "1.4"
+                    };
+                }
+            }
+
+            function clearResults() {
+                if (resPower) resPower.textContent = "0";
+                if (resCurrent) resCurrent.textContent = "0.00";
+                if (resResistance) resResistance.textContent = "0.00";
+                if (resArea) resArea.textContent = "0.00";
+                if (resLength) resLength.textContent = "0.00";
+                if (resTurns) resTurns.textContent = "0";
+                if (resCoilLength) resCoilLength.textContent = "0.0";
+            }
+
+            function calculate() {
+                let V = 0; // 公升 (L)
+                let innerSurfaceArea = 0; // 平方公分 (cm²)
+                const volMode = document.querySelector('input[name="vol_mode"]:checked')?.value || 'direct';
+
+                if (volMode === 'direct') {
+                    V = parseFloat(volumeInput ? volumeInput.value : 0) || 0;
+                    if (V > 0) {
+                        const side = Math.cbrt(V * 1000);
+                        innerSurfaceArea = 6 * Math.pow(side, 2);
+                    }
+                } else if (volMode === 'box') {
+                    const l = parseFloat(boxL ? boxL.value : 0) || 0;
+                    const w = parseFloat(boxW ? boxW.value : 0) || 0;
+                    const h = parseFloat(boxH ? boxH.value : 0) || 0;
+                    if (l > 0 && w > 0 && h > 0) {
+                        V = (l * w * h) / 1000;
+                        innerSurfaceArea = 2 * (l * w + l * h + w * h);
+                    }
+                } else if (volMode === 'cylinder') {
+                    const r = parseFloat(cylR ? cylR.value : 0) || 0;
+                    const h = parseFloat(cylH ? cylH.value : 0) || 0;
+                    if (r > 0 && h > 0) {
+                        V = (Math.PI * Math.pow(r, 2) * h) / 1000;
+                        innerSurfaceArea = 2 * Math.PI * Math.pow(r, 2) + 2 * Math.PI * r * h;
+                    }
+                } else if (volMode === 'octagon') {
+                    const a = parseFloat(octS ? octS.value : 0) || 0;
+                    const h = parseFloat(octH ? octH.value : 0) || 0;
+                    if (a > 0 && h > 0) {
+                        const baseArea = 2 * (1 + Math.SQRT2) * Math.pow(a, 2);
+                        V = (baseArea * h) / 1000;
+                        innerSurfaceArea = 2 * baseArea + 8 * a * h;
+                    }
+                } else if (volMode === 'decagon') {
+                    const a = parseFloat(decS ? decS.value : 0) || 0;
+                    const h = parseFloat(decH ? decH.value : 0) || 0;
+                    if (a > 0 && h > 0) {
+                        const baseArea = 2.5 * Math.sqrt(5 + 2 * Math.sqrt(5)) * Math.pow(a, 2);
+                        V = (baseArea * h) / 1000;
+                        innerSurfaceArea = 2 * baseArea + 10 * a * h;
+                    }
+                }
+
+                if (volMode !== 'direct' && calcVolDisplay) {
+                    calcVolDisplay.textContent = V > 0 ? V.toFixed(1) : "0.0";
+                }
+                if (calcAreaDisplay) {
+                    calcAreaDisplay.textContent = innerSurfaceArea > 0 ? Math.round(innerSurfaceArea) : "0";
+                }
+
+                const U = parseFloat(voltageInput ? voltageInput.value : 0);
+                const D = parseFloat(diameterInput ? diameterInput.value : 0);
+                const D_rod = parseFloat(rodDiameterInput ? rodDiameterInput.value : 0);
+
+                let rho = 0;
+                const rhoMode = document.querySelector('input[name="rho_mode"]:checked')?.value || 'preset';
+                
+                if (rhoMode === 'preset') {
+                    rho = parseFloat(materialSelect ? materialSelect.value : 1.4);
+                } else if (rhoMode === 'custom') {
+                    rho = parseFloat(customRhoInput ? customRhoInput.value : 1.4);
+                } else if (rhoMode === 'measure') {
+                    const mL = parseFloat(measureLInput ? measureLInput.value : 0);
+                    const mR = parseFloat(measureRInput ? measureRInput.value : 0);
+                    if (mL > 0 && mR > 0 && D > 0) {
+                        const S = (Math.PI * Math.pow(D, 2)) / 4;
+                        rho = (mR * S) / mL;
+                        if (calcRhoDisplay) calcRhoDisplay.textContent = rho.toFixed(3);
+                    } else {
+                        if (calcRhoDisplay) calcRhoDisplay.textContent = "---";
+                        rho = NaN;
+                    }
+                }
+
+                if (isNaN(V) || isNaN(U) || isNaN(D) || isNaN(D_rod) || isNaN(rho) || V <= 0 || U <= 0 || D <= 0 || D_rod <= 0 || rho <= 0) {
+                    clearResults();
+                    return;
+                }
+
+                let P = 0;
+                const powerEvalMode = document.querySelector('input[name="power_eval_mode"]:checked')?.value || 'olsen';
+                const safetyMargin = parseFloat(safetyMarginSelect ? safetyMarginSelect.value : 1.15) || 1.15;
+
+                if (powerEvalMode === 'olsen') {
+                    const density = parseFloat(olsenDensityInput ? olsenDensityInput.value : 0.85) || 0.85;
+                    P = innerSurfaceArea * density * safetyMargin;
+                    const equivalentWPerL = V > 0 ? (P / V).toFixed(1) : "0.0";
+                    if (powerAdvice) {
+                        powerAdvice.textContent = `*根據內表面積 (${Math.round(innerSurfaceArea)} cm²) 計算：相當於 ${equivalentWPerL} W/公升 (含 ${safetyMargin}x 餘裕)`;
+                    }
+                } else if (powerEvalMode === 'volume') {
+                    let baseWPerL = 85;
+                    if (V <= 10) baseWPerL = 120;
+                    else if (V <= 50) baseWPerL = 85;
+                    else if (V <= 200) baseWPerL = 60;
+                    else baseWPerL = 40;
+
+                    const hotFactor = parseFloat(hotBrickSelect ? hotBrickSelect.value : 1.0) || 1.0;
+                    const backupFactor = parseFloat(backupInsulSelect ? backupInsulSelect.value : 0.95) || 0.95;
+
+                    P = V * baseWPerL * hotFactor * backupFactor * safetyMargin;
+                    if (powerAdvice) {
+                        powerAdvice.textContent = `*基於容量 ${V.toFixed(1)}L (${baseWPerL}W/L) 搭配磚材/背襯修正算得 (含 ${safetyMargin}x 餘裕)`;
+                    }
+                } else {
+                    const customP = parseFloat(customPowerInput ? customPowerInput.value : 2500) || 2500;
+                    P = customP * safetyMargin;
+                    if (powerAdvice) {
+                        powerAdvice.textContent = `*使用手動指定瓦數 ${customP} W (含 ${safetyMargin}x 餘裕 = ${Math.round(P)} W)`;
+                    }
+                }
+
+                // 電氣與導線幾何計算
+                const I = P / U;
+                const R = Math.pow(U, 2) / P;
+                const S = (Math.PI * Math.pow(D, 2)) / 4;
+                const L = (S * R) / rho;
+
+                // 繞圈計算 (平均直徑 = 心軸直徑 + 線徑)
+                const D_mean = D_rod + D;
+                const turnLengthMeters = (Math.PI * D_mean) / 1000;
+                const turns = L / turnLengthMeters;
+                const coilLengthCm = (turns * D) / 10;
+
+                // 渲染結果至畫面
+                if (resPower) resPower.textContent = Math.round(P);
+                if (resCurrent) resCurrent.textContent = I.toFixed(2);
+                if (resResistance) resResistance.textContent = R.toFixed(2);
+                if (resArea) resArea.textContent = S.toFixed(3);
+                if (resLength) resLength.textContent = L.toFixed(2);
+                if (resTurns) resTurns.textContent = Math.round(turns);
+                if (resCoilLength) resCoilLength.textContent = coilLengthCm.toFixed(1);
+            }
+
+            // 綁定「一鍵套用建議」按鈕
+            if (applyRecBtn) {
+                applyRecBtn.addEventListener('click', () => {
+                    const volRadio = document.querySelector('input[name="power_eval_mode"][value="volume"]');
+                    if (volRadio) {
+                        volRadio.checked = true;
+                        updatePowerEvalUI();
+                    }
+
+                    if (hotBrickSelect) hotBrickSelect.value = currentRec.hotBrickValue;
+                    if (backupInsulSelect) backupInsulSelect.value = currentRec.backupInsulValue;
+
+                    const rhoPresetRadio = document.querySelector('input[name="rho_mode"][value="preset"]');
+                    if (rhoPresetRadio) {
+                        rhoPresetRadio.checked = true;
+                        updateRhoUI();
+                    }
+                    if (materialSelect) materialSelect.value = currentRec.wireMaterialValue;
+
+                    calculate();
+                });
+            }
+
+            // 綁定熱學說明 Modal 開關
+            toggleGuideBtn?.addEventListener('click', () => thermalGuideBox?.classList.toggle('hidden'));
+            closeGuideBtn?.addEventListener('click', () => thermalGuideBox?.classList.add('hidden'));
+
+            // 綁定模式 Radio 切換
+            volRadios.forEach(radio => radio.addEventListener('change', updateVolUI));
+            powerEvalRadios.forEach(radio => radio.addEventListener('change', updatePowerEvalUI));
+            rhoRadios.forEach(radio => radio.addEventListener('change', updateRhoUI));
+
+            // 綁定溫度選單改變
+            targetTempPreset?.addEventListener('change', updateRecommendation);
+            targetTempInput?.addEventListener('input', updateRecommendation);
+
+            // 綁定數值變動即時計算
+            [
+                volumeInput, boxL, boxW, boxH, cylR, cylH, octS, octH, decS, decH,
+                olsenDensityInput, hotBrickSelect, backupInsulSelect, customPowerInput, safetyMarginSelect,
+                voltageInput, diameterInput, rodDiameterInput, materialSelect, customRhoInput,
+                measureLInput, measureRInput
+            ].forEach(input => {
+                input?.addEventListener('input', calculate);
+                input?.addEventListener('change', calculate);
+            });
+
+            // 初始化 UI 與計算
+            updateVolUI();
+            updatePowerEvalUI();
+            updateRhoUI();
+            updateRecommendation();
+            calculate();
+        });
+    </script>
+</body>
+</html>
